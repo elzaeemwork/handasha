@@ -289,6 +289,9 @@ export async function render(container) {
   renderStats();
 
   return () => {
-    // When leaving page, do not destroy interval if running, so it continues
+    if (timerInterval) {
+      clearInterval(timerInterval);
+      timerInterval = null;
+    }
   };
 }

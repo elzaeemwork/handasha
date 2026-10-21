@@ -22,17 +22,22 @@ function generateId() {
 }
 
 /**
- * Cascading delete for a subject and its related files, tasks, lectures, and exams.
+ * Cascading delete for a subject and ALL its related records (files, tasks, lectures, exams, notes, mindmaps, quizzes, flashcards, focusSessions).
  * @param {string} subjectId
  * @param {string} [subjectName='المادة']
  * @returns {Promise<boolean>}
  */
 async function deleteSubjectCascade(subjectId, subjectName = 'المادة') {
-  const [files, tasks, lectures, exams] = await Promise.all([
+  const [files, tasks, lectures, exams, notes, decks, quizzes, mindmaps, sessions] = await Promise.all([
     getAll('files').catch(() => []),
     getAll('tasks').catch(() => []),
     getAll('schedule').catch(() => []),
-    getAll('exams').catch(() => [])
+    getAll('exams').catch(() => []),
+    getAll('notes').catch(() => []),
+    getAll('flashcardDecks').catch(() => []),
+    getAll('quizzes').catch(() => []),
+    getAll('mindmaps').catch(() => []),
+    getAll('focusSessions').catch(() => [])
   ]);
 
   const relatedFiles = files.filter(f => f.subjectId === subjectId);
@@ -40,7 +45,7 @@ async function deleteSubjectCascade(subjectId, subjectName = 'المادة') {
 
   const confirmed = await confirm(
     'حذف المادة نهائياً؟',
-    `هل أنت متأكد من رغبتك في حذف «${subjectName}»؟ سيتم حذف ${formatNumber(relatedFiles.length)} ملف و${formatNumber(relatedTasks.length)} مهمة وكافة محاضراتها واختباراتها بشكل دائم.`,
+    `هل أنت متأكد من رغبتك في حذف «${subjectName}»؟ سيتم حذف جميع المحاضرات والملفات والمهام والاختبارات والبطاقات والملاحظات التابعة لها بشكل دائم.`,
     'حذف نهائي',
     'إلغاء',
     true
@@ -49,16 +54,38 @@ async function deleteSubjectCascade(subjectId, subjectName = 'المادة') {
   if (!confirmed) return false;
 
   try {
+    // 1. Files, Tasks, Schedule, Exams, Notes, Mindmaps, Sessions
     for (const f of relatedFiles) await remove('files', f.id).catch(() => {});
     for (const t of relatedTasks) await remove('tasks', t.id).catch(() => {});
     for (const l of lectures.filter(l => l.subjectId === subjectId)) await remove('schedule', l.id).catch(() => {});
     for (const e of exams.filter(e => e.subjectId === subjectId)) await remove('exams', e.id).catch(() => {});
+    for (const n of notes.filter(n => n.subjectId === subjectId)) await remove('notes', n.id).catch(() => {});
+    for (const m of mindmaps.filter(m => m.subjectId === subjectId)) await remove('mindmaps', m.id).catch(() => {});
+    for (const s of sessions.filter(s => s.subjectId === subjectId)) await remove('focusSessions', s.id).catch(() => {});
+
+    // 2. Flashcard decks & their individual cards
+    const targetDecks = decks.filter(d => d.subjectId === subjectId);
+    const allCards = await getAll('flashcards').catch(() => []);
+    for (const d of targetDecks) {
+      for (const c of allCards.filter(c => c.deckId === d.id)) await remove('flashcards', c.id).catch(() => {});
+      await remove('flashcardDecks', d.id).catch(() => {});
+    }
+
+    // 3. Quizzes & their questions
+    const targetQuizzes = quizzes.filter(q => q.subjectId === subjectId);
+    const allQuestions = await getAll('quizQuestions').catch(() => []);
+    for (const q of targetQuizzes) {
+      for (const qu of allQuestions.filter(qu => qu.quizId === q.id)) await remove('quizQuestions', qu.id).catch(() => {});
+      await remove('quizzes', q.id).catch(() => {});
+    }
+
+    // 4. Finally delete the subject
     await remove('subjects', subjectId);
 
-    toast('تم حذف المادة بنجاح', 'success');
+    toast('تم حذف المادة وكافة بياناتها التابعة بنجاح', 'success');
     return true;
   } catch (err) {
-    console.error('Error deleting subject:', err);
+    console.error('Error deleting subject cascade:', err);
     toast('حدث خطأ أثناء حذف المادة', 'error');
     return false;
   }

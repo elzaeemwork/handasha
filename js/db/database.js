@@ -4,8 +4,10 @@
  * @module db/database
  */
 
+import { runMigrations, SCHEMA_VERSION } from './migrations.js';
+
 const DB_NAME = 'handasha-db';
-const DB_VERSION = 1;
+const DB_VERSION = SCHEMA_VERSION || 1;
 
 /**
  * Generate a UUID v4 string.
@@ -148,6 +150,9 @@ function openDB() {
 
     request.onupgradeneeded = (event) => {
       const db = event.target.result;
+      const tx = event.target.transaction;
+      const oldVersion = event.oldVersion;
+      const newVersion = event.newVersion;
 
       for (const [storeName, config] of Object.entries(SCHEMA)) {
         if (!db.objectStoreNames.contains(storeName)) {
@@ -157,6 +162,15 @@ function openDB() {
           for (const idx of config.indexes) {
             store.createIndex(idx.name, idx.keyPath, idx.options);
           }
+        }
+      }
+
+      // Execute schema migrations if upgrading from an earlier version
+      if (oldVersion > 0 && typeof runMigrations === 'function') {
+        try {
+          runMigrations(db, tx, oldVersion, newVersion);
+        } catch (migErr) {
+          console.error('[IDB] Migration failed:', migErr);
         }
       }
     };
@@ -230,6 +244,10 @@ async function withStore(storeName, mode, callback) {
 
     const store = tx.objectStore(storeName);
     const request = callback(store);
+
+    tx.onabort = () => {
+      reject(new Error(`تم إجهاض المعاملة على "${storeName}": ${tx.error?.message || 'Transaction aborted'}`));
+    };
 
     request.onsuccess = () => resolve(request.result);
     request.onerror = () =>
