@@ -22,6 +22,49 @@ function generateId() {
 }
 
 /**
+ * Cascading delete for a subject and its related files, tasks, lectures, and exams.
+ * @param {string} subjectId
+ * @param {string} [subjectName='المادة']
+ * @returns {Promise<boolean>}
+ */
+async function deleteSubjectCascade(subjectId, subjectName = 'المادة') {
+  const [files, tasks, lectures, exams] = await Promise.all([
+    getAll('files').catch(() => []),
+    getAll('tasks').catch(() => []),
+    getAll('schedule').catch(() => []),
+    getAll('exams').catch(() => [])
+  ]);
+
+  const relatedFiles = files.filter(f => f.subjectId === subjectId);
+  const relatedTasks = tasks.filter(t => t.subjectId === subjectId);
+
+  const confirmed = await confirm(
+    'حذف المادة نهائياً؟',
+    `هل أنت متأكد من رغبتك في حذف «${subjectName}»؟ سيتم حذف ${formatNumber(relatedFiles.length)} ملف و${formatNumber(relatedTasks.length)} مهمة وكافة محاضراتها واختباراتها بشكل دائم.`,
+    'حذف نهائي',
+    'إلغاء',
+    true
+  );
+
+  if (!confirmed) return false;
+
+  try {
+    for (const f of relatedFiles) await remove('files', f.id).catch(() => {});
+    for (const t of relatedTasks) await remove('tasks', t.id).catch(() => {});
+    for (const l of lectures.filter(l => l.subjectId === subjectId)) await remove('schedule', l.id).catch(() => {});
+    for (const e of exams.filter(e => e.subjectId === subjectId)) await remove('exams', e.id).catch(() => {});
+    await remove('subjects', subjectId);
+
+    toast('تم حذف المادة بنجاح', 'success');
+    return true;
+  } catch (err) {
+    console.error('Error deleting subject:', err);
+    toast('حدث خطأ أثناء حذف المادة', 'error');
+    return false;
+  }
+}
+
+/**
  * Show add/edit subject form
  */
 function showSubjectForm(existingSubject, onSave) {
@@ -99,15 +142,37 @@ function showSubjectForm(existingSubject, onSave) {
     if (!opt) return;
     colorInput.value = opt.dataset.color;
     colorPicker.querySelectorAll('.color-opt').forEach(el => {
-      el.style.borderColor = el.dataset.color === opt.dataset.color ? '#1a1a2e' : 'transparent';
+      el.style.borderColor = el.dataset.color === opt.dataset.color ? 'var(--color-text)' : 'transparent';
     });
   });
 
-  modal({
-    title: isEdit ? 'تعديل المادة' : 'إضافة مادة جديدة',
-    content,
-    confirmText: isEdit ? 'حفظ التعديلات' : 'إضافة',
-    onConfirm: async () => {
+  const actions = [
+    {
+      text: 'إلغاء',
+      className: 'btn btn-secondary',
+      onClick: (closeFn) => closeFn()
+    }
+  ];
+
+  if (isEdit) {
+    actions.push({
+      text: 'حذف المادة',
+      className: 'btn btn-danger',
+      onClick: async (closeFn) => {
+        const deleted = await deleteSubjectCascade(subj.id, subj.name);
+        if (deleted) {
+          closeFn();
+          window.location.hash = '#/subjects';
+          if (onSave) onSave();
+        }
+      }
+    });
+  }
+
+  actions.push({
+    text: isEdit ? 'حفظ التعديلات' : 'إضافة المادة',
+    className: 'btn btn-primary',
+    onClick: async (closeFn) => {
       const form = content.querySelector('#subject-form');
       const name = form.querySelector('[name="name"]').value.trim();
       const instructor = form.querySelector('[name="instructor"]').value.trim();
@@ -119,7 +184,7 @@ function showSubjectForm(existingSubject, onSave) {
       const nameCheck = validateRequired(name, 'اسم المادة');
       if (!nameCheck.valid) {
         toast(nameCheck.error, 'warning');
-        return false;
+        return;
       }
 
       const data = {
@@ -138,9 +203,15 @@ function showSubjectForm(existingSubject, onSave) {
         toast('تمت إضافة المادة بنجاح', 'success');
       }
 
+      closeFn();
       if (onSave) onSave();
-      return true;
     }
+  });
+
+  modal({
+    title: isEdit ? 'تعديل المادة' : 'إضافة مادة جديدة',
+    content,
+    actions
   });
 }
 
@@ -267,7 +338,7 @@ async function renderSubjectList(container) {
 
         card.innerHTML = `
           <div style="font-size: 16px; font-weight: 700; color: var(--color-text, #1a1a2e); margin-bottom: 6px;
-                      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-left: 28px;">
             ${sanitizeHTML(subj.name)}
           </div>
           ${subj.instructor ? `<div style="font-size: 12px; color: var(--color-text-secondary, #6b7280); margin-bottom: 12px;
@@ -280,6 +351,51 @@ async function renderSubjectList(container) {
           ${subj.archived ? `<div style="position: absolute; top: 8px; left: 8px; font-size: 10px; padding: 2px 6px;
             border-radius: 6px; background: #6b728020; color: #6b7280;">أرشيف</div>` : ''}
         `;
+
+        const optionsBtn = document.createElement('button');
+        optionsBtn.className = 'subject-card-options-btn';
+        optionsBtn.style.cssText = `
+          position: absolute; top: 10px; left: 10px; width: 28px; height: 28px;
+          border-radius: 50%; border: none; background: transparent; cursor: pointer;
+          color: var(--color-text-secondary, #6b7280); display: flex; align-items: center;
+          justify-content: center; padding: 0; z-index: 2;
+        `;
+        optionsBtn.innerHTML = icon('more-vertical', 16);
+        optionsBtn.title = 'خيارات المادة';
+        optionsBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          bottomSheet({
+            title: subj.name,
+            items: [
+              {
+                icon: 'edit',
+                label: 'تعديل المادة',
+                onClick: () => {
+                  showSubjectForm(subj, () => renderSubjectList(container));
+                }
+              },
+              {
+                icon: 'archive',
+                label: subj.archived ? 'إلغاء الأرشفة' : 'أرشفة المادة',
+                onClick: async () => {
+                  await update('subjects', { ...subj, archived: !subj.archived, updatedAt: new Date().toISOString() });
+                  toast(subj.archived ? 'تم إلغاء الأرشفة' : 'تمت أرشفة المادة', 'success');
+                  renderSubjectList(container);
+                }
+              },
+              {
+                icon: 'trash',
+                label: 'حذف المادة نهائياً',
+                danger: true,
+                onClick: async () => {
+                  const deleted = await deleteSubjectCascade(subj.id, subj.name);
+                  if (deleted) renderSubjectList(container);
+                }
+              }
+            ]
+          });
+        });
+        card.appendChild(optionsBtn);
         grid.appendChild(card);
       });
     }
@@ -419,7 +535,8 @@ async function renderSubjectDetail(container, subjectId) {
         title: subj.name,
         items: [
           {
-            label: `${icon('archive')} ${subj.archived ? 'إلغاء الأرشفة' : 'أرشفة المادة'}`,
+            icon: 'archive',
+            label: subj.archived ? 'إلغاء الأرشفة' : 'أرشفة المادة',
             onClick: async () => {
               const yes = await confirm(subj.archived ? 'إلغاء أرشفة المادة؟' : 'أرشفة المادة؟', subj.archived ? 'سيتم إعادة المادة إلى القائمة الرئيسية' : 'سيتم نقل المادة إلى الأرشيف');
               if (yes) {
@@ -430,21 +547,12 @@ async function renderSubjectDetail(container, subjectId) {
             }
           },
           {
-            label: `${icon('delete')} حذف المادة`,
+            icon: 'trash',
+            label: 'حذف المادة نهائياً',
             danger: true,
             onClick: async () => {
-              const yes = await confirm(
-                'حذف المادة نهائيًا؟',
-                `سيتم حذف ${formatNumber(files.length)} ملف و${formatNumber(tasks.length)} مهمة مرتبطة`
-              );
-              if (yes) {
-                // Delete related data
-                for (const f of files) await remove('files', f.id).catch(() => {});
-                for (const t of tasks) await remove('tasks', t.id).catch(() => {});
-                for (const l of lectures) await remove('schedule', l.id).catch(() => {});
-                for (const e of exams) await remove('exams', e.id).catch(() => {});
-                await remove('subjects', subjectId);
-                toast('تم حذف المادة', 'success');
+              const deleted = await deleteSubjectCascade(subjectId, subj.name);
+              if (deleted) {
                 window.location.hash = '#/subjects';
               }
             }
