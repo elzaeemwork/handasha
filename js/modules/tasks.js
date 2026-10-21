@@ -290,50 +290,50 @@ export async function render(container) {
 
     const formHTML = `
       <form id="task-form" style="display: flex; flex-direction: column; gap: 14px; direction: rtl;">
-        <div>
-          <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px;">عنوان المهمة *</label>
-          <input type="text" name="title" value="${sanitizeHTML(cur.title)}" placeholder="مثال: تسليم شيت المسائل 3" required style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--color-border); background: var(--color-bg); font-size: 14px;" />
+        <div class="form-group" style="margin: 0;">
+          <label class="form-label" style="display: block; font-size: 13px; font-weight: 600; color: var(--color-text); margin-bottom: 6px;">عنوان المهمة *</label>
+          <input type="text" name="title" class="form-input" value="${sanitizeHTML(cur.title)}" placeholder="مثال: تسليم شيت المسائل 3" required />
         </div>
 
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-          <div>
-            <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px;">المادة الدراسية</label>
-            <select name="subjectId" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--color-border); background: var(--color-bg); font-size: 14px;">
+          <div class="form-group" style="margin: 0;">
+            <label class="form-label" style="display: block; font-size: 13px; font-weight: 600; color: var(--color-text); margin-bottom: 6px;">المادة الدراسية</label>
+            <select name="subjectId" class="form-select">
               <option value="">(شخصي / عام)</option>
               ${subjects.map((s) => `<option value="${s.id}" ${s.id === cur.subjectId ? 'selected' : ''}>${sanitizeHTML(s.name)}</option>`).join('')}
             </select>
           </div>
-          <div>
-            <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px;">نوع المهمة</label>
-            <select name="type" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--color-border); background: var(--color-bg); font-size: 14px;">
+          <div class="form-group" style="margin: 0;">
+            <label class="form-label" style="display: block; font-size: 13px; font-weight: 600; color: var(--color-text); margin-bottom: 6px;">نوع المهمة</label>
+            <select name="type" class="form-select">
               ${Object.entries(TASK_TYPES).map(([k, v]) => `<option value="${k}" ${k === cur.type ? 'selected' : ''}>${v}</option>`).join('')}
             </select>
           </div>
         </div>
 
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-          <div>
-            <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px;">تاريخ التسليم</label>
-            <input type="date" name="deadlineDate" value="${deadlineDateStr}" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--color-border); background: var(--color-bg); font-size: 14px;" />
+          <div class="form-group" style="margin: 0;">
+            <label class="form-label" style="display: block; font-size: 13px; font-weight: 600; color: var(--color-text); margin-bottom: 6px;">تاريخ التسليم</label>
+            <input type="date" name="deadlineDate" class="form-input" value="${deadlineDateStr}" />
           </div>
-          <div>
-            <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px;">وقت التسليم</label>
-            <input type="time" name="deadlineTime" value="${deadlineTimeStr}" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--color-border); background: var(--color-bg); font-size: 14px;" />
+          <div class="form-group" style="margin: 0;">
+            <label class="form-label" style="display: block; font-size: 13px; font-weight: 600; color: var(--color-text); margin-bottom: 6px;">وقت التسليم</label>
+            <input type="time" name="deadlineTime" class="form-input" value="${deadlineTimeStr}" />
           </div>
         </div>
 
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-          <div>
-            <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px;">الأولوية</label>
-            <select name="priority" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--color-border); background: var(--color-bg); font-size: 14px;">
+          <div class="form-group" style="margin: 0;">
+            <label class="form-label" style="display: block; font-size: 13px; font-weight: 600; color: var(--color-text); margin-bottom: 6px;">الأولوية</label>
+            <select name="priority" class="form-select">
               <option value="low" ${cur.priority === 'low' ? 'selected' : ''}>منخفضة</option>
               <option value="medium" ${cur.priority === 'medium' ? 'selected' : ''}>متوسطة</option>
               <option value="high" ${cur.priority === 'high' ? 'selected' : ''}>عالية جداً</option>
             </select>
           </div>
-          <div>
-            <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px;">الحالة</label>
-            <select name="status" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--color-border); background: var(--color-bg); font-size: 14px;">
+          <div class="form-group" style="margin: 0;">
+            <label class="form-label" style="display: block; font-size: 13px; font-weight: 600; color: var(--color-text); margin-bottom: 6px;">الحالة</label>
+            <select name="status" class="form-select">
               <option value="notStarted" ${cur.status === 'notStarted' ? 'selected' : ''}>لم تبدأ</option>
               <option value="inProgress" ${cur.status === 'inProgress' ? 'selected' : ''}>قيد التنفيذ</option>
               <option value="completed" ${cur.status === 'completed' ? 'selected' : ''}>مكتملة</option>
@@ -341,14 +341,14 @@ export async function render(container) {
           </div>
         </div>
 
-        <div>
-          <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px;">وقت الدراسة المتوقع (بالدقائق)</label>
-          <input type="number" name="estimatedTime" value="${cur.estimatedTime || 45}" min="5" max="600" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--color-border); background: var(--color-bg); font-size: 14px;" />
+        <div class="form-group" style="margin: 0;">
+          <label class="form-label" style="display: block; font-size: 13px; font-weight: 600; color: var(--color-text); margin-bottom: 6px;">وقت الدراسة المتوقع (بالدقائق)</label>
+          <input type="number" name="estimatedTime" class="form-input" value="${cur.estimatedTime || 45}" min="5" max="600" />
         </div>
 
-        <div>
-          <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px;">تفاصيل إضافية</label>
-          <textarea name="details" rows="3" placeholder="تفاصيل المطلوب والمراجع المطلوبة..." style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--color-border); background: var(--color-bg); font-size: 14px; resize: vertical;">${sanitizeHTML(cur.details || '')}</textarea>
+        <div class="form-group" style="margin: 0;">
+          <label class="form-label" style="display: block; font-size: 13px; font-weight: 600; color: var(--color-text); margin-bottom: 6px;">تفاصيل إضافية</label>
+          <textarea name="details" class="form-textarea" rows="3" placeholder="تفاصيل المطلوب والمراجع المطلوبة...">${sanitizeHTML(cur.details || '')}</textarea>
         </div>
       </form>
     `;

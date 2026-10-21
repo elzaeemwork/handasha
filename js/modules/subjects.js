@@ -30,30 +30,25 @@ function showSubjectForm(existingSubject, onSave) {
 
   const content = document.createElement('div');
   content.innerHTML = `
-    <form id="subject-form" style="display: flex; flex-direction: column; gap: 16px;">
-      <div>
-        <label style="display: block; font-size: 14px; font-weight: 600; color: var(--color-text, #1a1a2e); margin-bottom: 6px;">
+    <form id="subject-form" style="display: flex; flex-direction: column; gap: 14px;">
+      <div class="form-group" style="margin: 0;">
+        <label class="form-label" style="display: block; font-size: 14px; font-weight: 600; color: var(--color-text); margin-bottom: 6px;">
           اسم المادة <span style="color: #ef4444;">*</span>
         </label>
-        <input type="text" name="name" value="${sanitizeHTML(subj.name || '')}" placeholder="مثال: الرياضيات الهندسية"
-          style="width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--color-border, #e8ecf2);
-                 font-size: 15px; background: var(--color-bg, #F5F7FB); box-sizing: border-box; direction: rtl;" />
+        <input type="text" name="name" class="form-input" value="${sanitizeHTML(subj.name || '')}" placeholder="مثال: الرياضيات الهندسية" />
       </div>
-      <div>
-        <label style="display: block; font-size: 14px; font-weight: 600; color: var(--color-text, #1a1a2e); margin-bottom: 6px;">
+      <div class="form-group" style="margin: 0;">
+        <label class="form-label" style="display: block; font-size: 14px; font-weight: 600; color: var(--color-text); margin-bottom: 6px;">
           اسم المدرّس
         </label>
-        <input type="text" name="instructor" value="${sanitizeHTML(subj.instructor || '')}" placeholder="اسم التدريسي"
-          style="width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--color-border, #e8ecf2);
-                 font-size: 15px; background: var(--color-bg, #F5F7FB); box-sizing: border-box; direction: rtl;" />
+        <input type="text" name="instructor" class="form-input" value="${sanitizeHTML(subj.instructor || '')}" placeholder="اسم التدريسي" />
       </div>
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-        <div>
-          <label style="display: block; font-size: 14px; font-weight: 600; color: var(--color-text, #1a1a2e); margin-bottom: 6px;">
+        <div class="form-group" style="margin: 0;">
+          <label class="form-label" style="display: block; font-size: 14px; font-weight: 600; color: var(--color-text); margin-bottom: 6px;">
             المرحلة
           </label>
-          <select name="stage" style="width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--color-border, #e8ecf2);
-                   font-size: 15px; background: var(--color-bg, #F5F7FB); box-sizing: border-box; direction: rtl;">
+          <select name="stage" class="form-select">
             <option value="">— اختر —</option>
             <option value="1" ${subj.stage === '1' ? 'selected' : ''}>الأولى</option>
             <option value="2" ${subj.stage === '2' ? 'selected' : ''}>الثانية</option>
@@ -62,12 +57,11 @@ function showSubjectForm(existingSubject, onSave) {
             <option value="5" ${subj.stage === '5' ? 'selected' : ''}>الخامسة</option>
           </select>
         </div>
-        <div>
-          <label style="display: block; font-size: 14px; font-weight: 600; color: var(--color-text, #1a1a2e); margin-bottom: 6px;">
+        <div class="form-group" style="margin: 0;">
+          <label class="form-label" style="display: block; font-size: 14px; font-weight: 600; color: var(--color-text); margin-bottom: 6px;">
             الفصل
           </label>
-          <select name="semester" style="width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--color-border, #e8ecf2);
-                   font-size: 15px; background: var(--color-bg, #F5F7FB); box-sizing: border-box; direction: rtl;">
+          <select name="semester" class="form-select">
             <option value="">— اختر —</option>
             <option value="1" ${subj.semester === '1' ? 'selected' : ''}>الأول</option>
             <option value="2" ${subj.semester === '2' ? 'selected' : ''}>الثاني</option>
@@ -75,27 +69,24 @@ function showSubjectForm(existingSubject, onSave) {
           </select>
         </div>
       </div>
-      <div>
-        <label style="display: block; font-size: 14px; font-weight: 600; color: var(--color-text, #1a1a2e); margin-bottom: 8px;">
-          اللون
+      <div class="form-group" style="margin: 0;">
+        <label class="form-label" style="display: block; font-size: 14px; font-weight: 600; color: var(--color-text); margin-bottom: 8px;">
+          اللون المميز
         </label>
         <div id="color-picker" style="display: flex; gap: 10px; flex-wrap: wrap;">
           ${PRESET_COLORS.map(c => `
             <div data-color="${c}" class="color-opt" style="width: 36px; height: 36px; border-radius: 50%;
-              background: ${c}; cursor: pointer; border: 3px solid ${(subj.color || PRESET_COLORS[0]) === c ? '#1a1a2e' : 'transparent'};
+              background: ${c}; cursor: pointer; border: 3px solid ${(subj.color || PRESET_COLORS[0]) === c ? 'var(--color-text)' : 'transparent'};
               transition: border-color 0.15s ease;"></div>
           `).join('')}
         </div>
         <input type="hidden" name="color" value="${subj.color || PRESET_COLORS[0]}" />
       </div>
-      <div>
-        <label style="display: block; font-size: 14px; font-weight: 600; color: var(--color-text, #1a1a2e); margin-bottom: 6px;">
+      <div class="form-group" style="margin: 0;">
+        <label class="form-label" style="display: block; font-size: 14px; font-weight: 600; color: var(--color-text); margin-bottom: 6px;">
           الوصف
         </label>
-        <textarea name="description" rows="3" placeholder="ملاحظات عن المادة..."
-          style="width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--color-border, #e8ecf2);
-                 font-size: 15px; background: var(--color-bg, #F5F7FB); box-sizing: border-box; resize: vertical;
-                 direction: rtl; font-family: inherit;">${sanitizeHTML(subj.description || '')}</textarea>
+        <textarea name="description" class="form-textarea" rows="3" placeholder="ملاحظات عن المادة...">${sanitizeHTML(subj.description || '')}</textarea>
       </div>
     </form>
   `;
@@ -125,7 +116,11 @@ function showSubjectForm(existingSubject, onSave) {
       const color = form.querySelector('[name="color"]').value;
       const description = form.querySelector('[name="description"]').value.trim();
 
-      if (!validateRequired(name, 'اسم المادة')) return false;
+      const nameCheck = validateRequired(name, 'اسم المادة');
+      if (!nameCheck.valid) {
+        toast(nameCheck.error, 'warning');
+        return false;
+      }
 
       const data = {
         name, instructor, stage, semester, color, description,
@@ -255,6 +250,7 @@ async function renderSubjectList(container) {
         const taskCount = tasks.filter(t => t.subjectId === subj.id && t.status !== 'completed').length;
 
         const card = document.createElement('div');
+        card.className = 'subject-card';
         card.style.cssText = `
           background: var(--color-surface, #fff); border-radius: 16px; padding: 16px;
           box-shadow: 0 1px 3px rgba(0,0,0,0.06); border: 1px solid var(--color-border, #e8ecf2);

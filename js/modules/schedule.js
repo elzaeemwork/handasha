@@ -162,7 +162,7 @@ export async function render(container) {
               .sort((a, b) => (a.startTime || '').localeCompare(b.startTime || ''));
 
             return `
-              <div class="card" style="padding: 14px; ${d.id === todayIndex ? 'border-right: 4px solid var(--color-primary); background: #ffffff;' : ''}">
+              <div class="card" style="padding: 14px; ${d.id === todayIndex ? 'border-right: 4px solid var(--color-primary); background: var(--color-surface-raised);' : ''}">
                 <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--color-border); padding-bottom: 8px; margin-bottom: 10px;">
                   <div style="display: flex; align-items: center; gap: 8px;">
                     <span style="font-size: 15px; font-weight: 700; color: var(--color-text);">${d.name}</span>
@@ -291,9 +291,9 @@ export async function render(container) {
 
     const formHTML = `
       <form id="lecture-form" style="display: flex; flex-direction: column; gap: 14px; direction: rtl;">
-        <div>
-          <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px;">المادة الدراسية *</label>
-          <select name="subjectId" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--color-border); background: var(--color-bg); font-size: 14px;">
+        <div class="form-group" style="margin: 0;">
+          <label class="form-label" style="display: block; font-size: 13px; font-weight: 600; color: var(--color-text); margin-bottom: 6px;">المادة الدراسية *</label>
+          <select name="subjectId" class="form-select">
             ${subjects
               .map(
                 (s) => `
@@ -305,9 +305,9 @@ export async function render(container) {
         </div>
 
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-          <div>
-            <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px;">اليوم *</label>
-            <select name="dayOfWeek" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--color-border); background: var(--color-bg); font-size: 14px;">
+          <div class="form-group" style="margin: 0;">
+            <label class="form-label" style="display: block; font-size: 13px; font-weight: 600; color: var(--color-text); margin-bottom: 6px;">اليوم *</label>
+            <select name="dayOfWeek" class="form-select">
               ${DAYS.map(
                 (d) => `
                 <option value="${d.id}" ${Number(d.id) === Number(cur.dayOfWeek) ? 'selected' : ''}>${d.name}</option>
@@ -315,9 +315,9 @@ export async function render(container) {
               ).join('')}
             </select>
           </div>
-          <div>
-            <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px;">نوع المحاضرة</label>
-            <select name="lectureType" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--color-border); background: var(--color-bg); font-size: 14px;">
+          <div class="form-group" style="margin: 0;">
+            <label class="form-label" style="display: block; font-size: 13px; font-weight: 600; color: var(--color-text); margin-bottom: 6px;">نوع المحاضرة</label>
+            <select name="lectureType" class="form-select">
               <option value="نظري" ${cur.lectureType === 'نظري' ? 'selected' : ''}>نظري</option>
               <option value="عملي" ${cur.lectureType === 'عملي' ? 'selected' : ''}>عملي</option>
               <option value="مختبر" ${cur.lectureType === 'مختبر' ? 'selected' : ''}>مختبر</option>
@@ -327,24 +327,24 @@ export async function render(container) {
         </div>
 
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-          <div>
-            <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px;">وقت البدء *</label>
-            <input type="time" name="startTime" value="${cur.startTime || '08:30'}" required style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--color-border); background: var(--color-bg); font-size: 14px;" />
+          <div class="form-group" style="margin: 0;">
+            <label class="form-label" style="display: block; font-size: 13px; font-weight: 600; color: var(--color-text); margin-bottom: 6px;">وقت البدء *</label>
+            <input type="time" name="startTime" class="form-input" value="${cur.startTime || '08:30'}" required />
           </div>
-          <div>
-            <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px;">وقت الانتهاء *</label>
-            <input type="time" name="endTime" value="${cur.endTime || '10:30'}" required style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--color-border); background: var(--color-bg); font-size: 14px;" />
+          <div class="form-group" style="margin: 0;">
+            <label class="form-label" style="display: block; font-size: 13px; font-weight: 600; color: var(--color-text); margin-bottom: 6px;">وقت الانتهاء *</label>
+            <input type="time" name="endTime" class="form-input" value="${cur.endTime || '10:30'}" required />
           </div>
         </div>
 
-        <div>
-          <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px;">القاعة أو المختبر (اختياري)</label>
-          <input type="text" name="location" value="${sanitizeHTML(cur.location || '')}" placeholder="مثال: قاعة 302 أو مختبر الاتصالات" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--color-border); background: var(--color-bg); font-size: 14px;" />
+        <div class="form-group" style="margin: 0;">
+          <label class="form-label" style="display: block; font-size: 13px; font-weight: 600; color: var(--color-text); margin-bottom: 6px;">القاعة أو المختبر (اختياري)</label>
+          <input type="text" name="location" class="form-input" value="${sanitizeHTML(cur.location || '')}" placeholder="مثال: قاعة 302 أو مختبر الاتصالات" />
         </div>
 
-        <div>
-          <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px;">ملاحظات (اختياري)</label>
-          <input type="text" name="notes" value="${sanitizeHTML(cur.notes || '')}" placeholder="مثال: إحضار دفتر التجارب" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--color-border); background: var(--color-bg); font-size: 14px;" />
+        <div class="form-group" style="margin: 0;">
+          <label class="form-label" style="display: block; font-size: 13px; font-weight: 600; color: var(--color-text); margin-bottom: 6px;">ملاحظات (اختياري)</label>
+          <input type="text" name="notes" class="form-input" value="${sanitizeHTML(cur.notes || '')}" placeholder="مثال: إحضار دفتر التجارب" />
         </div>
       </form>
     `;

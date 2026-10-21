@@ -103,13 +103,50 @@ export function confirm(title, message, confirmText = 'تأكيد', cancelText =
 }
 
 /**
- * Generic Modal Dialog.
- * @param {string} title - Modal title
- * @param {string|HTMLElement} content - Content string or node
- * @param {Array<{text: string, className?: string, onClick?: Function}>} [actions=[]]
+ * Generic Modal Dialog. Supports both argument list and configuration object.
+ * @param {string|Object} titleOrConfig - Modal title or { title, content, confirmText, cancelText, onConfirm, actions }
+ * @param {string|HTMLElement} [contentArg] - Content string or node
+ * @param {Array<{text: string, className?: string, onClick?: Function}>} [actionsArg=[]]
  * @returns {{close: Function, element: HTMLElement}}
  */
-export function modal(title, content, actions = []) {
+export function modal(titleOrConfig, contentArg, actionsArg = []) {
+  let title = '';
+  let content = contentArg;
+  let actions = actionsArg;
+
+  if (typeof titleOrConfig === 'object' && titleOrConfig !== null && !titleOrConfig.nodeType) {
+    title = titleOrConfig.title || '';
+    content = titleOrConfig.content;
+    if (Array.isArray(titleOrConfig.actions)) {
+      actions = titleOrConfig.actions;
+    } else {
+      actions = [];
+      if (titleOrConfig.cancelText !== false && (titleOrConfig.cancelText || titleOrConfig.onConfirm)) {
+        actions.push({
+          text: titleOrConfig.cancelText || 'إلغاء',
+          className: 'btn btn-secondary',
+          onClick: (closeFn) => closeFn(),
+        });
+      }
+      if (titleOrConfig.onConfirm || titleOrConfig.confirmText) {
+        actions.push({
+          text: titleOrConfig.confirmText || 'تأكيد',
+          className: 'btn btn-primary',
+          onClick: async (closeFn) => {
+            if (typeof titleOrConfig.onConfirm === 'function') {
+              const res = await titleOrConfig.onConfirm(closeFn);
+              if (res !== false) closeFn();
+            } else {
+              closeFn();
+            }
+          },
+        });
+      }
+    }
+  } else {
+    title = String(titleOrConfig || '');
+  }
+
   const overlay = document.createElement('div');
   overlay.className = 'dialog-overlay modal-overlay-wrapper';
 

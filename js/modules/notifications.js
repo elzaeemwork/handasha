@@ -66,7 +66,7 @@ export async function render(container) {
               : notifications
                   .map((n) => {
                     return `
-                    <div class="card" style="display: flex; align-items: flex-start; gap: 12px; ${!n.isRead ? 'border-right: 4px solid var(--color-primary); background: #ffffff;' : 'opacity: 0.75;'}">
+                    <div class="card" style="display: flex; align-items: flex-start; gap: 12px; ${!n.isRead ? 'border-right: 4px solid var(--color-primary); background: var(--color-surface-raised);' : 'opacity: 0.75;'}">
                       <div class="summary-icon-box" style="width: 36px; height: 36px; border-radius: 8px; ${!n.isRead ? 'background: #3657C815; color: var(--color-primary);' : ''}">
                         ${icon(n.type === 'exam' ? 'file-text' : 'bell', 18)}
                       </div>

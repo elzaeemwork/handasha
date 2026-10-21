@@ -216,52 +216,52 @@ export async function render(container) {
     const formHTML = `
       <form id="exam-form" style="display: flex; flex-direction: column; gap: 14px; direction: rtl;">
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-          <div>
-            <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px;">المادة الدراسية *</label>
-            <select name="subjectId" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--color-border); background: var(--color-bg); font-size: 14px;">
+          <div class="form-group" style="margin: 0;">
+            <label class="form-label" style="display: block; font-size: 13px; font-weight: 600; color: var(--color-text); margin-bottom: 6px;">المادة الدراسية *</label>
+            <select name="subjectId" class="form-select">
               ${subjects.map((s) => `<option value="${s.id}" ${s.id === cur.subjectId ? 'selected' : ''}>${sanitizeHTML(s.name)}</option>`).join('')}
             </select>
           </div>
-          <div>
-            <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px;">نوع الاختبار *</label>
-            <select name="type" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--color-border); background: var(--color-bg); font-size: 14px;">
+          <div class="form-group" style="margin: 0;">
+            <label class="form-label" style="display: block; font-size: 13px; font-weight: 600; color: var(--color-text); margin-bottom: 6px;">نوع الاختبار *</label>
+            <select name="type" class="form-select">
               ${Object.entries(EXAM_TYPES).map(([k, v]) => `<option value="${k}" ${k === cur.type ? 'selected' : ''}>${v}</option>`).join('')}
             </select>
           </div>
         </div>
 
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-          <div>
-            <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px;">التاريخ *</label>
-            <input type="date" name="date" value="${cur.date}" required style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--color-border); background: var(--color-bg); font-size: 14px;" />
+          <div class="form-group" style="margin: 0;">
+            <label class="form-label" style="display: block; font-size: 13px; font-weight: 600; color: var(--color-text); margin-bottom: 6px;">التاريخ *</label>
+            <input type="date" name="date" class="form-input" value="${cur.date}" required />
           </div>
-          <div>
-            <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px;">الوقت</label>
-            <input type="time" name="time" value="${cur.time || '09:00'}" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--color-border); background: var(--color-bg); font-size: 14px;" />
+          <div class="form-group" style="margin: 0;">
+            <label class="form-label" style="display: block; font-size: 13px; font-weight: 600; color: var(--color-text); margin-bottom: 6px;">الوقت</label>
+            <input type="time" name="time" class="form-input" value="${cur.time || '09:00'}" />
           </div>
         </div>
 
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-          <div>
-            <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px;">مكان الامتحان (اختياري)</label>
-            <input type="text" name="location" value="${sanitizeHTML(cur.location || '')}" placeholder="مثال: القاعة الكبرى" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--color-border); background: var(--color-bg); font-size: 14px;" />
+          <div class="form-group" style="margin: 0;">
+            <label class="form-label" style="display: block; font-size: 13px; font-weight: 600; color: var(--color-text); margin-bottom: 6px;">مكان الامتحان (اختياري)</label>
+            <input type="text" name="location" class="form-input" value="${sanitizeHTML(cur.location || '')}" placeholder="مثال: القاعة الكبرى" />
           </div>
-          <div>
-            <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px;">مستوى الاستعداد</label>
-            <select name="readiness" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--color-border); background: var(--color-bg); font-size: 14px;">
+          <div class="form-group" style="margin: 0;">
+            <label class="form-label" style="display: block; font-size: 13px; font-weight: 600; color: var(--color-text); margin-bottom: 6px;">مستوى الاستعداد</label>
+            <select name="readiness" class="form-select">
               ${Object.entries(READINESS_LEVELS).map(([k, v]) => `<option value="${k}" ${k === cur.readiness ? 'selected' : ''}>${v.label}</option>`).join('')}
             </select>
           </div>
         </div>
 
-        <div>
-          <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px;">الموضوعات الداخلة في الامتحان</label>
-          <textarea name="topics" rows="3" placeholder="مثال: الفصول 1، 2، 3 + مسائل الشيت الأخير..." style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--color-border); background: var(--color-bg); font-size: 14px; resize: vertical;">${sanitizeHTML(cur.topics || '')}</textarea>
+        <div class="form-group" style="margin: 0;">
+          <label class="form-label" style="display: block; font-size: 13px; font-weight: 600; color: var(--color-text); margin-bottom: 6px;">الموضوعات الداخلة في الامتحان</label>
+          <textarea name="topics" class="form-textarea" rows="3" placeholder="مثال: الفصول 1، 2، 3 + مسائل الشيت الأخير...">${sanitizeHTML(cur.topics || '')}</textarea>
         </div>
 
-        <div>
-          <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px;">ملاحظات إضافية</label>
-          <input type="text" name="notes" value="${sanitizeHTML(cur.notes || '')}" placeholder="مثال: مسموح بالآلة الحاسبة الهندسية وجدول القوانين" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--color-border); background: var(--color-bg); font-size: 14px;" />
+        <div class="form-group" style="margin: 0;">
+          <label class="form-label" style="display: block; font-size: 13px; font-weight: 600; color: var(--color-text); margin-bottom: 6px;">ملاحظات إضافية</label>
+          <input type="text" name="notes" class="form-input" value="${sanitizeHTML(cur.notes || '')}" placeholder="مثال: مسموح بالآلة الحاسبة الهندسية وجدول القوانين" />
         </div>
       </form>
     `;

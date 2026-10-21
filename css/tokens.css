@@ -35,6 +35,7 @@
   --color-bg: #F5F7FB;
   --color-bg-secondary: #EEF1F7;
   --color-surface: #FFFFFF;
+  --color-card: #FFFFFF;
   --color-surface-raised: #FFFFFF;
   --color-surface-overlay: rgba(0, 0, 0, 0.4);
   --color-surface-sheet: #FFFFFF;
@@ -187,6 +188,7 @@
   --color-bg: #0F1318;
   --color-bg-secondary: #161B23;
   --color-surface: #1C222D;
+  --color-card: #1C222D;
   --color-surface-raised: #232A37;
   --color-surface-overlay: rgba(0, 0, 0, 0.6);
   --color-surface-sheet: #1C222D;

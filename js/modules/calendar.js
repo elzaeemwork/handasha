@@ -400,8 +400,16 @@ function showReminderForm(existing, defaultDate) {
       const timeVal = document.getElementById('reminder-time').value;
       const notesVal = document.getElementById('reminder-notes').value.trim();
 
-      if (!validateRequired(titleVal, 'العنوان')) return;
-      if (!validateRequired(dateVal, 'التاريخ')) return;
+      const tCheck = validateRequired(titleVal, 'عنوان التذكير');
+      if (!tCheck.valid) {
+        toast(tCheck.error, 'warning');
+        return;
+      }
+      const dCheck = validateRequired(dateVal, 'التاريخ');
+      if (!dCheck.valid) {
+        toast(dCheck.error, 'warning');
+        return;
+      }
 
       const reminderData = {
         title: titleVal,
