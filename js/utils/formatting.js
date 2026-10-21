@@ -4,17 +4,22 @@
  * @module utils/formatting
  */
 
-/** Eastern Arabic numerals mapping */
+/** Eastern Arabic numerals mapping (optional) */
 const ARABIC_DIGITS = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
 
 /**
- * Convert a number or numeric string to Eastern Arabic numerals.
- * Preserves non-digit characters (dots, colons, etc.).
+ * Format a number or numeric string.
+ * Uses standard numerals (0, 1, 2, 3...) for clear readability in engineering and academic contexts.
  * @param {number|string} num
+ * @param {boolean} [useEastern=false]
  * @returns {string}
  */
-export function formatNumber(num) {
-  return String(num).replace(/[0-9]/g, (d) => ARABIC_DIGITS[parseInt(d, 10)]);
+export function formatNumber(num, useEastern = false) {
+  if (num === null || num === undefined) return '';
+  if (useEastern) {
+    return String(num).replace(/[0-9]/g, (d) => ARABIC_DIGITS[parseInt(d, 10)]);
+  }
+  return String(num);
 }
 
 /**

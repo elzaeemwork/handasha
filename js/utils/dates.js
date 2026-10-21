@@ -35,12 +35,17 @@ const MONTH_NAMES = [
 const ARABIC_DIGITS = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
 
 /**
- * Convert a number (or numeric string) to Eastern Arabic numerals.
+ * Format numerals for clean dates and times in engineering context.
  * @param {number|string} num
+ * @param {boolean} [useEastern=false]
  * @returns {string}
  */
-export function toArabicNumerals(num) {
-  return String(num).replace(/[0-9]/g, (d) => ARABIC_DIGITS[parseInt(d, 10)]);
+export function toArabicNumerals(num, useEastern = false) {
+  if (num === null || num === undefined) return '';
+  if (useEastern) {
+    return String(num).replace(/[0-9]/g, (d) => ARABIC_DIGITS[parseInt(d, 10)]);
+  }
+  return String(num);
 }
 
 /**

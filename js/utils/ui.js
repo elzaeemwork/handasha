@@ -299,6 +299,26 @@ export function bottomSheet(titleOrConfig, optionsArg = []) {
   });
 }
 
+let _emptyActionCounter = 0;
+const _emptyActionRegistry = new Map();
+
+// Delegated click listener to support emptyState buttons whether added via DOM or innerHTML
+if (typeof document !== 'undefined') {
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('.empty-state-btn[data-action-id]');
+    if (btn) {
+      const fn = _emptyActionRegistry.get(btn.dataset.actionId);
+      if (typeof fn === 'function') {
+        try {
+          fn();
+        } catch (err) {
+          console.error('Error executing empty state action:', err);
+        }
+      }
+    }
+  });
+}
+
 /**
  * Render empty state markup.
  * @param {string} iconName - Icon identifier
@@ -327,11 +347,17 @@ export function emptyState(iconName, title, description, actionText, actionFn) {
     iconMarkup = icon('info', 48);
   }
 
+  let actionId = '';
+  if (actionText && actionFn) {
+    actionId = `empty-act-${++_emptyActionCounter}`;
+    _emptyActionRegistry.set(actionId, actionFn);
+  }
+
   container.innerHTML = `
     <div class="empty-state-icon">${iconMarkup}</div>
     <h3 class="empty-state-title">${sanitizeHTML(title || '')}</h3>
     <p class="empty-state-desc">${sanitizeHTML(description || '')}</p>
-    ${actionText ? `<button class="btn btn-primary empty-state-btn">${sanitizeHTML(actionText)}</button>` : ''}
+    ${actionText ? `<button class="btn btn-primary empty-state-btn" data-action-id="${actionId}">${sanitizeHTML(actionText)}</button>` : ''}
   `;
 
   if (actionText && actionFn) {

@@ -250,9 +250,9 @@ export async function render(container) {
         <button class="calc-btn op" data-insert="tan(">tan</button>
         <button class="calc-btn op" data-insert="^">xʸ</button>
 
-        <!-- Row 2 -->
-        <button class="calc-btn op" data-insert="log(">log</button>
-        <button class="calc-btn op" data-insert="ln(">ln</button>
+        <!-- Row 2 (Parentheses & Root) -->
+        <button class="calc-btn op" data-insert="(">(</button>
+        <button class="calc-btn op" data-insert=")">)</button>
         <button class="calc-btn op" data-insert="sqrt(">√</button>
         <button class="calc-btn op" data-insert="/">÷</button>
 
@@ -275,17 +275,17 @@ export async function render(container) {
         <button class="calc-btn op" data-insert="+">+</button>
 
         <!-- Row 6 -->
-        <button class="calc-btn op" data-insert="(">(</button>
+        <button class="calc-btn op" data-insert="π">π</button>
         <button class="calc-btn" data-insert="0">0</button>
         <button class="calc-btn" data-insert=".">.</button>
         <button class="calc-btn primary" id="btn-equals">=</button>
       </div>
 
-      <!-- Row 7 (Constants) -->
+      <!-- Row 7 (Constants & Logarithms) -->
       <div style="display: flex; gap: 8px; margin-top: 4px;">
-        <button class="calc-btn op" style="flex: 1;" data-insert="π">π (3.1415)</button>
-        <button class="calc-btn op" style="flex: 1;" data-insert="e">e (2.7182)</button>
-        <button class="calc-btn op" style="flex: 1;" data-insert=")">)</button>
+        <button class="calc-btn op" style="flex: 1;" data-insert="log(">log₁₀</button>
+        <button class="calc-btn op" style="flex: 1;" data-insert="ln(">ln</button>
+        <button class="calc-btn op" style="flex: 1;" data-insert="e">e (2.718)</button>
       </div>
     `;
   }

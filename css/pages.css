@@ -369,9 +369,10 @@
 }
 
 .task-checkbox {
-  width: 22px;
-  height: 22px;
-  border-radius: 6px;
+  position: relative;
+  width: 24px;
+  height: 24px;
+  border-radius: 7px;
   border: 2px solid var(--color-border, #E5EAF2);
   display: flex;
   align-items: center;
@@ -379,12 +380,38 @@
   cursor: pointer;
   flex-shrink: 0;
   margin-top: 2px;
+  background: var(--color-surface, #ffffff);
+  transition: transform var(--transition-fast), background-color var(--transition-fast), border-color var(--transition-fast);
+}
+
+/* Invisible touch target hit-area (48x48px) conforming to Apple HIG */
+.task-checkbox::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  min-width: 48px;
+  min-height: 48px;
+  width: 100%;
+  height: 100%;
+}
+
+.task-checkbox:active {
+  transform: scale(0.88);
 }
 
 .task-checkbox.checked {
   background: var(--color-secondary, #24A58A);
   border-color: var(--color-secondary, #24A58A);
   color: #ffffff;
+  animation: checkbox-bounce 0.32s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes checkbox-bounce {
+  0% { transform: scale(0.85); }
+  50% { transform: scale(1.15); }
+  100% { transform: scale(1); }
 }
 
 .task-info {
@@ -959,6 +986,8 @@
   font-weight: 700;
   color: var(--color-text, #202938);
   direction: ltr;
+  font-family: var(--font-family-mono, monospace);
+  font-variant-numeric: tabular-nums;
 }
 
 .calc-grid {

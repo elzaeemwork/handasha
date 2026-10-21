@@ -282,7 +282,8 @@
 .fab {
   position: fixed;
   bottom: var(--fab-bottom-offset);
-  left: var(--page-padding-x);
+  right: var(--page-padding-x);
+  left: auto;
   width: var(--fab-size);
   height: var(--fab-size);
   border-radius: var(--radius-full);
@@ -293,7 +294,7 @@
   justify-content: center;
   box-shadow: var(--shadow-fab);
   z-index: var(--z-fab);
-  transition: transform var(--transition-base), box-shadow var(--transition-base), background-color var(--transition-base);
+  transition: transform var(--transition-spring), box-shadow var(--transition-base), background-color var(--transition-base);
   font-size: 24px;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
@@ -492,12 +493,12 @@
 /* ── Toast Container ── */
 .toast-container {
   position: fixed;
-  top: calc(var(--safe-top) + var(--space-4));
+  bottom: calc(var(--bottom-nav-total) + var(--space-4));
   left: var(--space-4);
   right: var(--space-4);
   z-index: var(--z-toast);
   display: flex;
-  flex-direction: column;
+  flex-direction: column-reverse;
   align-items: center;
   gap: var(--space-2);
   pointer-events: none;

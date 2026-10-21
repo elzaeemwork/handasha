@@ -1453,3 +1453,145 @@
 .sheet-footer {
   padding: 12px 20px 0;
 }
+
+/* ========================================================
+   HANDASHA UI/UX Optimization Additions (HIG & Accessibility)
+   ======================================================== */
+
+/* ── 1. Quick Access Strip (شريط الوصول السريع) ── */
+.quick-access-strip {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding: 4px 0 16px;
+  margin-bottom: 8px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.quick-access-strip::-webkit-scrollbar {
+  display: none;
+}
+
+.quick-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--color-surface, #ffffff);
+  border: 1px solid var(--color-border, #E5EAF2);
+  border-radius: var(--radius-full);
+  padding: 6px 14px 6px 8px;
+  cursor: pointer;
+  white-space: nowrap;
+  min-height: 44px;
+  box-shadow: 0 1px 3px rgba(32, 41, 56, 0.05);
+  transition: transform 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.quick-pill:hover {
+  box-shadow: 0 3px 8px rgba(32, 41, 56, 0.08);
+}
+
+.quick-pill:active {
+  transform: scale(0.96);
+  background: var(--color-bg-secondary, #EEF1F7);
+}
+
+.quick-pill-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  flex-shrink: 0;
+}
+
+.focus-gradient { background: linear-gradient(135deg, #EF5350, #D32F2F); }
+.calc-gradient  { background: linear-gradient(135deg, #26C6DA, #0097A7); }
+.note-gradient  { background: linear-gradient(135deg, #26A69A, #00897B); }
+.map-gradient   { background: linear-gradient(135deg, #AB47BC, #7B1FA2); }
+
+.quick-pill-label {
+  font-size: var(--text-sm, 13px);
+  font-weight: 600;
+  color: var(--color-text, #202938);
+}
+
+/* ── 2. Frosted Glass Modern Shell (iOS Polish) ── */
+.app-header {
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  background-color: rgba(255, 255, 255, 0.88) !important;
+}
+
+[data-theme="dark"] .app-header {
+  background-color: rgba(24, 32, 45, 0.88) !important;
+}
+
+.bottom-nav {
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  background-color: rgba(255, 255, 255, 0.90) !important;
+}
+
+[data-theme="dark"] .bottom-nav {
+  background-color: rgba(24, 32, 45, 0.90) !important;
+}
+
+/* ── 3. Tabular Digits & Monospace Support ── */
+.tabular-digits,
+.stat-number,
+.calc-res,
+.timer-display,
+.timer-text,
+.badge-count {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+/* ── 4. Touch Targets Security (Invisible Safe Hit Area) ── */
+.btn-ghost-sm,
+.btn-edit-task,
+.btn-delete-task,
+.cal-nav-btn {
+  position: relative;
+  min-width: 38px;
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-ghost-sm::after,
+.btn-edit-task::after,
+.btn-delete-task::after,
+.cal-nav-btn::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  min-width: 44px;
+  min-height: 44px;
+  width: 100%;
+  height: 100%;
+}
+
+/* ── 5. Proactive Empty State Card ── */
+.empty-state {
+  position: relative;
+  padding: 32px 20px;
+}
+
+.empty-state-btn {
+  margin-top: 14px;
+  box-shadow: 0 4px 14px rgba(54, 87, 200, 0.25);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.empty-state-btn:active {
+  transform: scale(0.97);
+}

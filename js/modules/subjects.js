@@ -335,9 +335,11 @@ async function renderSubjectList(container) {
       grid.innerHTML = '';
 
       if (filtered.length === 0) {
-        const msg = showArchived ? 'لا توجد مواد في الأرشيف' : (searchTerm ? 'لا توجد نتائج' : 'لم تضف أي مادة بعد');
-        const sub = showArchived ? '' : 'أضف موادك الدراسية لتبدأ بتنظيم دراستك';
-        grid.appendChild(emptyState(icon('book'), msg, sub));
+        const msg = showArchived ? 'لا توجد مواد في الأرشيف' : (searchTerm ? 'لا توجد نتائج مطابقة' : 'لم تضف أي مادة بعد');
+        const sub = showArchived ? 'المواد المؤرشفة تظهر هنا.' : (searchTerm ? 'جرّب البحث بكلمات أخرى.' : 'أضف موادك الدراسية الآن لتبدأ بربط المحاضرات والواجبات بها.');
+        const actionText = showArchived || searchTerm ? '' : '+ إضافة مادة جديدة';
+        const actionFn = showArchived || searchTerm ? null : () => showSubjectForm(null, () => renderSubjectList(container));
+        grid.appendChild(emptyState(icon('book'), msg, sub, actionText, actionFn));
         return;
       }
 

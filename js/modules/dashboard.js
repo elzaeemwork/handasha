@@ -102,7 +102,7 @@ function renderSummaryCard(iconName, label, value, color, onClick) {
                 display: flex; align-items: center; justify-content: center;">
       <span style="color: ${color}; font-size: 20px;">${icon(iconName)}</span>
     </div>
-    <span style="font-size: 22px; font-weight: 700; color: var(--color-text, #1a1a2e);">${sanitizeHTML(String(value))}</span>
+    <span class="tabular-digits" style="font-size: 22px; font-weight: 700; color: var(--color-text, #1a1a2e);">${sanitizeHTML(String(value))}</span>
     <span style="font-size: 12px; color: var(--color-text-secondary, #6b7280); text-align: center;">${sanitizeHTML(label)}</span>
   `;
   if (onClick) {
@@ -112,6 +112,40 @@ function renderSummaryCard(iconName, label, value, color, onClick) {
     card.addEventListener('pointerleave', () => { card.style.transform = ''; });
   }
   return card;
+}
+
+/**
+ * Render Quick Access Strip for frequent engineering tools
+ */
+function renderQuickAccessStrip() {
+  const strip = document.createElement('div');
+  strip.className = 'quick-access-strip';
+  strip.setAttribute('role', 'toolbar');
+  strip.setAttribute('aria-label', 'أدوات الوصول السريع');
+
+  const tools = [
+    { label: 'مؤقت التركيز', route: '#/focus-timer', iconClass: 'focus-gradient', iconSvg: icon('timer', 18) },
+    { label: 'حاسبة هندسية', route: '#/calculator', iconClass: 'calc-gradient', iconSvg: icon('calculator', 18) },
+    { label: 'تدوين ملاحظة', route: '#/notes', iconClass: 'note-gradient', iconSvg: icon('note', 18) },
+    { label: 'خريطة مفاهيم', route: '#/mindmaps', iconClass: 'map-gradient', iconSvg: icon('brain', 18) },
+  ];
+
+  strip.innerHTML = tools.map(t => `
+    <button class="quick-pill" data-route="${t.route}" aria-label="${t.label}">
+      <div class="quick-pill-icon ${t.iconClass}">
+        ${t.iconSvg}
+      </div>
+      <span class="quick-pill-label">${t.label}</span>
+    </button>
+  `).join('');
+
+  strip.querySelectorAll('.quick-pill').forEach(btn => {
+    btn.addEventListener('click', () => {
+      window.location.hash = btn.dataset.route;
+    });
+  });
+
+  return strip;
 }
 
 /**
@@ -401,7 +435,10 @@ export async function render(container, params) {
     `;
     wrapper.appendChild(greetingEl);
 
-    // Summary cards
+    // Quick Access Strip (1-tap access to primary student tools)
+    wrapper.appendChild(renderQuickAccessStrip());
+
+    // Summary cards (responsive 2x2 on mobile, 4-col on desktop)
     const todayDayIndex = getTodayDayIndex();
     const todayLectures = lectures
       .filter(l => !l.archived && ((l.dayOfWeek !== undefined ? Number(l.dayOfWeek) : Number(l.day)) === todayDayIndex))
@@ -426,7 +463,7 @@ export async function render(container, params) {
     const notifCount = overdueTasks.length + urgentExams.length;
 
     const cardsRow = document.createElement('div');
-    cardsRow.style.cssText = 'display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 24px;';
+    cardsRow.style.cssText = 'display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-bottom: 24px;';
 
     cardsRow.appendChild(renderSummaryCard('calendar', 'محاضرات اليوم', todayLectures.length, '#3657C8',
       () => { window.location.hash = '#/schedule'; }));

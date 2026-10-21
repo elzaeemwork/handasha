@@ -8,6 +8,7 @@
   --color-primary: #3657C8;
   --color-primary-dark: #28449F;
   --color-primary-light: #4A6AD8;
+  --color-primary-text: #243E99;
   --color-primary-rgb: 54, 87, 200;
   --color-primary-bg: rgba(54, 87, 200, 0.08);
   --color-primary-bg-hover: rgba(54, 87, 200, 0.14);
@@ -15,12 +16,15 @@
   --color-secondary: #24A58A;
   --color-secondary-dark: #1C8A72;
   --color-secondary-light: #2DBFA0;
+  --color-secondary-text: #177360;
+  --color-secondary-contrast: #115647;
   --color-secondary-rgb: 36, 165, 138;
   --color-secondary-bg: rgba(36, 165, 138, 0.08);
 
   /* ── Semantic Colors ── */
   --color-success: #258B68;
   --color-success-light: #2AA876;
+  --color-success-text: #196349;
   --color-success-bg: rgba(37, 139, 104, 0.10);
   --color-warning: #E8A23A;
   --color-warning-dark: #D48E2A;
@@ -55,8 +59,8 @@
   --color-divider: #E5EAF2;
 
   /* ── Typography ── */
-  --font-family: -apple-system, 'SF Pro Arabic', 'Segoe UI', Tahoma, 'Noto Sans Arabic', sans-serif;
-  --font-family-mono: 'SF Mono', 'Cascadia Code', 'Courier New', monospace;
+  --font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Arabic', 'SF Pro Display', 'Segoe UI', Tahoma, 'Noto Sans Arabic', sans-serif;
+  --font-family-mono: 'SF Mono', 'Cascadia Code', 'Consolas', 'Courier New', monospace;
 
   /* Font sizes */
   --text-xs: 0.6875rem;    /* 11px */
@@ -75,10 +79,10 @@
   --weight-semibold: 600;
   --weight-bold: 700;
 
-  /* Line heights */
-  --leading-tight: 1.25;
-  --leading-normal: 1.5;
-  --leading-relaxed: 1.75;
+  /* Line heights — optimized for Arabic text ascenders & descenders */
+  --leading-tight: 1.38;
+  --leading-normal: 1.65;
+  --leading-relaxed: 1.85;
 
   /* ── Spacing Scale (4px base) ── */
   --space-0: 0;
@@ -163,6 +167,7 @@
   --color-primary: #5B7AE5;
   --color-primary-dark: #4A6AD8;
   --color-primary-light: #7B96F0;
+  --color-primary-text: #8FA8FF;
   --color-primary-rgb: 91, 122, 229;
   --color-primary-bg: rgba(91, 122, 229, 0.12);
   --color-primary-bg-hover: rgba(91, 122, 229, 0.20);
@@ -170,11 +175,14 @@
   --color-secondary: #2DBFA0;
   --color-secondary-dark: #24A58A;
   --color-secondary-light: #3DD4B3;
+  --color-secondary-text: #4BE4C2;
+  --color-secondary-contrast: #6BF0D1;
   --color-secondary-rgb: 45, 191, 160;
   --color-secondary-bg: rgba(45, 191, 160, 0.12);
 
   --color-success: #34C88B;
   --color-success-light: #3DD4B3;
+  --color-success-text: #50E6A7;
   --color-success-bg: rgba(52, 200, 139, 0.12);
   --color-warning: #F0B454;
   --color-warning-dark: #E8A23A;
@@ -185,25 +193,25 @@
   --color-info: #60A5FA;
   --color-info-bg: rgba(96, 165, 250, 0.12);
 
-  --color-bg: #0F1318;
-  --color-bg-secondary: #161B23;
-  --color-surface: #1C222D;
-  --color-card: #1C222D;
-  --color-surface-raised: #232A37;
-  --color-surface-overlay: rgba(0, 0, 0, 0.6);
-  --color-surface-sheet: #1C222D;
+  --color-bg: #0C1017;
+  --color-bg-secondary: #131A24;
+  --color-surface: #18202D;
+  --color-card: #18202D;
+  --color-surface-raised: #222C3D;
+  --color-surface-overlay: rgba(0, 0, 0, 0.65);
+  --color-surface-sheet: #18202D;
 
-  --color-text: #E8ECF2;
-  --color-text-secondary: #8B95A5;
-  --color-text-tertiary: #5A6578;
+  --color-text: #F0F4F8;
+  --color-text-secondary: #9DA8BA;
+  --color-text-tertiary: #758296;
   --color-text-inverse: #202938;
-  --color-text-link: #5B7AE5;
+  --color-text-link: #7B96F0;
   --color-text-on-primary: #FFFFFF;
 
-  --color-border: #2A3140;
-  --color-border-light: #1E2530;
+  --color-border: #242E3E;
+  --color-border-light: #1C2432;
   --color-border-focus: #5B7AE5;
-  --color-divider: #2A3140;
+  --color-divider: #242E3E;
 
   --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.15);
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.20), 0 1px 2px rgba(0, 0, 0, 0.15);

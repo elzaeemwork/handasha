@@ -224,10 +224,10 @@ function showNotFound(container, path) {
   container.innerHTML = `
     <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;text-align:center;padding:2rem;">
       <div style="font-size:4rem;margin-bottom:1rem;">🔍</div>
-      <h2 style="margin:0 0 0.5rem;color:var(--text-primary);">الصفحة غير موجودة</h2>
-      <p style="color:var(--text-secondary);margin:0 0 1.5rem;">المسار "${path}" غير موجود.</p>
+      <h2 style="margin:0 0 0.5rem;color:var(--color-text);">الصفحة غير موجودة</h2>
+      <p style="color:var(--color-text-secondary);margin:0 0 1.5rem;">المسار "${path}" غير موجود.</p>
       <button onclick="location.hash='#/home'" style="
-        background:var(--primary);color:#fff;border:none;padding:0.75rem 2rem;
+        background:var(--color-primary);color:#fff;border:none;padding:0.75rem 2rem;
         border-radius:12px;font-size:1rem;cursor:pointer;font-family:inherit;">
         العودة للرئيسية
       </button>
@@ -244,10 +244,10 @@ function showError(container, error) {
   container.innerHTML = `
     <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;text-align:center;padding:2rem;">
       <div style="font-size:4rem;margin-bottom:1rem;">⚠️</div>
-      <h2 style="margin:0 0 0.5rem;color:var(--text-primary);">حدث خطأ</h2>
-      <p style="color:var(--text-secondary);margin:0 0 1.5rem;">${error.message || 'خطأ غير متوقع أثناء تحميل الصفحة.'}</p>
+      <h2 style="margin:0 0 0.5rem;color:var(--color-text);">حدث خطأ</h2>
+      <p style="color:var(--color-text-secondary);margin:0 0 1.5rem;">${error.message || 'خطأ غير متوقع أثناء تحميل الصفحة.'}</p>
       <button onclick="location.reload()" style="
-        background:var(--primary);color:#fff;border:none;padding:0.75rem 2rem;
+        background:var(--color-primary);color:#fff;border:none;padding:0.75rem 2rem;
         border-radius:12px;font-size:1rem;cursor:pointer;font-family:inherit;">
         إعادة تحميل
       </button>
