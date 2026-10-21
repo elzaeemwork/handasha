@@ -106,7 +106,16 @@ function renderSummaryCard(iconName, label, value, color, onClick) {
     <span style="font-size: 12px; color: var(--color-text-secondary, #6b7280); text-align: center;">${sanitizeHTML(label)}</span>
   `;
   if (onClick) {
+    card.setAttribute('role', 'button');
+    card.setAttribute('tabindex', '0');
+    card.setAttribute('aria-label', `${label}: ${value}`);
     card.addEventListener('click', onClick);
+    card.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        onClick();
+      }
+    });
     card.addEventListener('pointerdown', () => { card.style.transform = 'scale(0.96)'; });
     card.addEventListener('pointerup', () => { card.style.transform = ''; });
     card.addEventListener('pointerleave', () => { card.style.transform = ''; });
@@ -401,7 +410,7 @@ function renderContinueStudying(settings, subjects) {
 export async function render(container, params) {
   container.innerHTML = '';
   const wrapper = document.createElement('div');
-  wrapper.style.cssText = 'padding: 16px 16px 100px; max-width: 600px; margin: 0 auto;';
+  wrapper.style.cssText = 'padding: 16px 16px 100px; max-width: var(--max-content-width, 1040px); margin: 0 auto;';
   wrapper.appendChild(loadingSpinner());
   container.appendChild(wrapper);
 
@@ -472,7 +481,8 @@ export async function render(container, params) {
     cardsRow.appendChild(renderSummaryCard('exam', 'أقرب امتحان',
       examCountdown !== null ? `${examCountdown} يوم` : '—', '#ef4444',
       () => { window.location.hash = '#/exams'; }));
-    cardsRow.appendChild(renderSummaryCard('bell', 'تنبيهات', notifCount, '#8b5cf6'));
+    cardsRow.appendChild(renderSummaryCard('bell', 'تنبيهات', notifCount, '#8b5cf6',
+      () => { window.location.hash = '#/notifications'; }));
 
     wrapper.appendChild(cardsRow);
 
@@ -480,22 +490,19 @@ export async function render(container, params) {
     const continueSection = renderContinueStudying(settings, subjects.filter(s => !s.archived));
     if (continueSection) wrapper.appendChild(continueSection);
 
-    // Today's schedule
-    wrapper.appendChild(renderTodaySchedule(todayLectures, subjects));
+    // Two-column responsive layout for Today's Schedule & Deadlines on Tablet/Desktop
+    const twoColContainer = document.createElement('div');
+    twoColContainer.className = 'dashboard-columns';
+    twoColContainer.appendChild(renderTodaySchedule(todayLectures, subjects));
 
-    // Add spacer
-    const spacer1 = document.createElement('div');
-    spacer1.style.height = '20px';
-    wrapper.appendChild(spacer1);
-
-    // Upcoming deadlines
     const upcoming = getUpcomingDeadlines(tasks, 3);
-    wrapper.appendChild(renderDeadlines(upcoming, overdueTasks, subjects));
+    twoColContainer.appendChild(renderDeadlines(upcoming, overdueTasks, subjects));
+    wrapper.appendChild(twoColContainer);
 
     // Add spacer
-    const spacer2 = document.createElement('div');
-    spacer2.style.height = '20px';
-    wrapper.appendChild(spacer2);
+    const spacer = document.createElement('div');
+    spacer.style.height = '20px';
+    wrapper.appendChild(spacer);
 
     // Study progress
     const progress = calculateWeekProgress(tasks);

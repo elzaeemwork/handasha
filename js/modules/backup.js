@@ -271,7 +271,9 @@ export async function render(container) {
         setTimeout(() => location.reload(), 1500);
       } catch (err) {
         console.error('Import error:', err);
-        toast('حدث خطأ أثناء قراءة ملف النسخة الاحتياطية.', 'error');
+        toast('حدث خطأ أثناء قراءة ملف النسخة الاحتياطية. تأكد من سلامة الملف وصيغة JSON.', 'error');
+      } finally {
+        fileInput.value = '';
       }
     });
 

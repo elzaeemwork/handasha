@@ -296,15 +296,15 @@ export async function render(container) {
         <!-- 1. dBm to mW Converter -->
         <div class="card" style="display: flex; flex-direction: column; gap: 10px;">
           <h4 style="margin: 0; font-size: 15px; font-weight: 700; color: var(--color-primary);">1. تحويل القدرة (dBm ⟷ mW)</h4>
-          <p style="font-size: 12px; color: var(--color-text-secondary); margin: 0;">P(mW) = 10^(P(dBm)/10) • P(dBm) = 10·log₁₀(P(mW))</p>
+          <p style="font-size: 12px; color: var(--color-text-secondary); margin: 0; direction: ltr; text-align: right;">P(mW) = 10^(P(dBm)/10) • P(dBm) = 10·log₁₀(P(mW))</p>
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
             <div>
               <label style="font-size: 12px; font-weight: 600;">القدرة (dBm)</label>
-              <input type="number" id="eng-dbm" placeholder="مثال: 20" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid var(--color-border); font-size: 14px;" />
+              <input type="number" id="eng-dbm" dir="ltr" placeholder="مثال: 20" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid var(--color-border); font-size: 16px;" />
             </div>
             <div>
               <label style="font-size: 12px; font-weight: 600;">القدرة (mW)</label>
-              <input type="number" id="eng-mw" placeholder="مثال: 100" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid var(--color-border); font-size: 14px;" />
+              <input type="number" id="eng-mw" dir="ltr" placeholder="مثال: 100" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid var(--color-border); font-size: 16px;" />
             </div>
           </div>
         </div>
@@ -312,17 +312,17 @@ export async function render(container) {
         <!-- 2. Frequency & Wavelength Converter -->
         <div class="card" style="display: flex; flex-direction: column; gap: 10px;">
           <h4 style="margin: 0; font-size: 15px; font-weight: 700; color: var(--color-primary);">2. التردد والطول الموجي (f ⟷ λ)</h4>
-          <p style="font-size: 12px; color: var(--color-text-secondary); margin: 0;">c = 3 × 10⁸ m/s • λ = c / f</p>
+          <p style="font-size: 12px; color: var(--color-text-secondary); margin: 0; direction: ltr; text-align: right;">c = 3 × 10⁸ m/s • λ = c / f</p>
           <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 8px;">
-            <input type="number" id="eng-freq" placeholder="قيمة التردد" style="padding: 8px; border-radius: 6px; border: 1px solid var(--color-border); font-size: 14px;" />
-            <select id="eng-freq-unit" style="padding: 8px; border-radius: 6px; border: 1px solid var(--color-border); font-size: 13px;">
+            <input type="number" id="eng-freq" dir="ltr" placeholder="قيمة التردد" style="padding: 8px; border-radius: 6px; border: 1px solid var(--color-border); font-size: 16px;" />
+            <select id="eng-freq-unit" style="padding: 8px; border-radius: 6px; border: 1px solid var(--color-border); font-size: 16px;">
               <option value="1">Hz</option>
               <option value="1000">kHz</option>
               <option value="1000000" selected>MHz</option>
               <option value="1000000000">GHz</option>
             </select>
           </div>
-          <div id="eng-lambda-res" style="background: var(--color-bg); padding: 10px; border-radius: 8px; font-size: 13px; font-weight: 600; text-align: center;">
+          <div id="eng-lambda-res" style="background: var(--color-bg); padding: 10px; border-radius: 8px; font-size: 14px; font-weight: 600; text-align: center;">
             الطول الموجي: --
           </div>
         </div>
@@ -333,31 +333,31 @@ export async function render(container) {
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 12px;">
             <div>
               <label>قدرة الإرسال Pt (dBm)</label>
-              <input type="number" id="eng-pt" value="20" style="width: 100%; padding: 6px; border-radius: 6px; border: 1px solid var(--color-border);" />
+              <input type="number" id="eng-pt" dir="ltr" value="20" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid var(--color-border); font-size: 16px;" />
             </div>
             <div>
               <label>ربح هوائي الإرسال Gt (dBi)</label>
-              <input type="number" id="eng-gt" value="14" style="width: 100%; padding: 6px; border-radius: 6px; border: 1px solid var(--color-border);" />
+              <input type="number" id="eng-gt" dir="ltr" value="14" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid var(--color-border); font-size: 16px;" />
             </div>
             <div>
               <label>ربح هوائي الاستقبال Gr (dBi)</label>
-              <input type="number" id="eng-gr" value="14" style="width: 100%; padding: 6px; border-radius: 6px; border: 1px solid var(--color-border);" />
+              <input type="number" id="eng-gr" dir="ltr" value="14" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid var(--color-border); font-size: 16px;" />
             </div>
             <div>
               <label>المسافة (km)</label>
-              <input type="number" id="eng-dist" value="5" style="width: 100%; padding: 6px; border-radius: 6px; border: 1px solid var(--color-border);" />
+              <input type="number" id="eng-dist" dir="ltr" value="5" min="0.001" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid var(--color-border); font-size: 16px;" />
             </div>
             <div>
               <label>التردد (MHz)</label>
-              <input type="number" id="eng-f-mhz" value="2400" style="width: 100%; padding: 6px; border-radius: 6px; border: 1px solid var(--color-border);" />
+              <input type="number" id="eng-f-mhz" dir="ltr" value="2400" min="1" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid var(--color-border); font-size: 16px;" />
             </div>
             <div>
               <label>خسائر الكيبلات (dB)</label>
-              <input type="number" id="eng-losses" value="2" style="width: 100%; padding: 6px; border-radius: 6px; border: 1px solid var(--color-border);" />
+              <input type="number" id="eng-losses" dir="ltr" value="2" min="0" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid var(--color-border); font-size: 16px;" />
             </div>
           </div>
-          <button id="btn-calc-link" class="btn btn-primary btn-sm" style="margin-top: 4px;">حساب القدرة المستقبلة</button>
-          <div id="eng-link-res" style="background: var(--color-bg); padding: 10px; border-radius: 8px; font-size: 13px; font-weight: 600; text-align: center;">
+          <button id="btn-calc-link" class="btn btn-primary" style="margin-top: 6px; min-height: 44px;">حساب القدرة المستقبلة</button>
+          <div id="eng-link-res" style="background: var(--color-bg); padding: 10px; border-radius: 8px; font-size: 14px; font-weight: 600; text-align: center;">
             القدرة المستقبلة Prx: --
           </div>
         </div>
@@ -482,11 +482,11 @@ export async function render(container) {
         const c = 299792458; // m/s
         const lambdaM = c / freqHz;
         if (lambdaM < 0.01) {
-          lambdaBox.innerHTML = `الطول الموجي λ: <b>${(lambdaM * 1000).toFixed(2)} mm</b> (${(lambdaM * 100).toFixed(2)} cm)`;
+          lambdaBox.innerHTML = `الطول الموجي λ: <bdi class="numeric-ltr font-bold">${(lambdaM * 1000).toFixed(2)} mm</bdi> (<bdi class="numeric-ltr">${(lambdaM * 100).toFixed(2)} cm</bdi>)`;
         } else if (lambdaM < 1) {
-          lambdaBox.innerHTML = `الطول الموجي λ: <b>${(lambdaM * 100).toFixed(2)} cm</b> (${lambdaM.toFixed(4)} m)`;
+          lambdaBox.innerHTML = `الطول الموجي λ: <bdi class="numeric-ltr font-bold">${(lambdaM * 100).toFixed(2)} cm</bdi> (<bdi class="numeric-ltr">${lambdaM.toFixed(4)} m</bdi>)`;
         } else {
-          lambdaBox.innerHTML = `الطول الموجي λ: <b>${lambdaM.toFixed(2)} متر</b>`;
+          lambdaBox.innerHTML = `الطول الموجي λ: <bdi class="numeric-ltr font-bold">${lambdaM.toFixed(2)} متر</bdi>`;
         }
       } else {
         lambdaBox.textContent = 'الطول الموجي: --';
@@ -515,9 +515,9 @@ export async function render(container) {
         const prx = pt + gt + gr - fspl - losses;
 
         linkResBox.innerHTML = `
-          <div>الخسارة في الفضاء الحر FSPL: <b>${fspl.toFixed(2)} dB</b></div>
+          <div>الخسارة في الفضاء الحر FSPL: <bdi class="numeric-ltr font-bold">${fspl.toFixed(2)} dB</bdi></div>
           <div style="font-size: 15px; color: ${prx >= -85 ? 'var(--color-secondary)' : 'var(--color-danger)'}; margin-top: 4px;">
-            القدرة المستقبلة Prx: <b>${prx.toFixed(2)} dBm</b> (${prx >= -85 ? 'إشارة ممتازة ✓' : 'إشارة ضعيفة ⚠️'})
+            القدرة المستقبلة Prx: <bdi class="numeric-ltr font-bold">${prx.toFixed(2)} dBm</bdi> (${prx >= -85 ? 'إشارة ممتازة ✓' : 'إشارة ضعيفة ⚠️'})
           </div>
         `;
       });

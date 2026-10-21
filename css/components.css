@@ -299,12 +299,36 @@
   box-shadow: var(--shadow-focus);
 }
 
-/* Date & Time Inputs */
+/* Date & Time Inputs - BiDi & Webkit shadow DOM safe alignment */
 .form-input[type="date"],
 .form-input[type="time"],
 .form-input[type="datetime-local"] {
-  text-align: right;
-  direction: rtl;
+  direction: ltr !important;
+  text-align: right !important;
+  font-family: var(--font-numeric, -apple-system, sans-serif);
+}
+
+/* Numeric & Engineering LTR Isolation */
+.numeric-ltr,
+input[type="number"],
+.math-expression,
+.eng-result-value {
+  direction: ltr !important;
+  text-align: left !important;
+  unicode-bidi: isolate;
+  font-family: var(--font-family-mono), monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Prevent iOS Safari auto-zoom on mobile inputs */
+@media screen and (max-width: 768px) {
+  .form-input,
+  .form-select,
+  .form-textarea,
+  select,
+  input:not([type="checkbox"]):not([type="radio"]) {
+    font-size: 16px !important;
+  }
 }
 
 /* Input help / error text */

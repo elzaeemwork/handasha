@@ -612,3 +612,62 @@
 .divider-spaced {
   margin: var(--space-5) 0;
 }
+
+/* ========================================================
+   Desktop & Tablet Adaptive Layout Grid (> 768px & > 1024px)
+   ======================================================== */
+
+@media (min-width: 768px) {
+  :root {
+    --max-content-width: 1040px;
+    --page-padding-x: var(--space-6);
+  }
+
+  /* Multi-column grid for subjects and cards */
+  #subjects-grid,
+  .subjects-grid {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)) !important;
+    gap: 16px !important;
+  }
+
+  .dashboard-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    align-items: start;
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --max-content-width: 1200px;
+  }
+
+  /* App shell centering on desktop */
+  .app-shell {
+    max-width: var(--max-content-width);
+    margin: 0 auto;
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.04);
+    border-left: 1px solid var(--color-border);
+    border-right: 1px solid var(--color-border);
+  }
+
+  .app-header {
+    max-width: var(--max-content-width);
+    margin: 0 auto;
+  }
+
+  /* Desktop Navigation: elegant centered dock */
+  .bottom-nav {
+    max-width: 680px;
+    margin: 0 auto;
+    left: 50% !important;
+    transform: translateX(-50%);
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
+  }
+
+  .fab {
+    right: calc(50% - 340px - 72px) !important;
+  }
+}

@@ -256,6 +256,76 @@ function showError(container, error) {
 }
 
 /**
+ * Dynamically update the app header with the current page title and back button
+ * @param {string} path
+ */
+function updateAppHeader(path) {
+  const header = document.getElementById('app-header');
+  if (!header) return;
+
+  const isHome = path === '/home' || path === '/';
+  
+  const routeTitles = {
+    '/home': 'هندسها',
+    '/subjects': 'المواد الدراسية',
+    '/schedule': 'الجدول الأسبوعي',
+    '/tasks': 'المهام والواجبات',
+    '/exams': 'الامتحانات والكوزات',
+    '/calendar': 'التقويم الأكاديمي',
+    '/more': 'الأدوات الإضافية',
+    '/notes': 'الملاحظات الدراسية',
+    '/focus-timer': 'مؤقت التركيز',
+    '/flashcards': 'البطاقات التعليمية',
+    '/quizzes': 'الاختبارات الذاتية',
+    '/calculator': 'الحاسبة الهندسية',
+    '/statistics': 'الإحصاءات والتقدم',
+    '/notifications': 'مركز التنبيهات',
+    '/backup': 'النسخ الاحتياطي',
+    '/settings': 'الإعدادات والمظهر',
+    '/onboarding': 'مرحباً بك في هندسها',
+  };
+
+  let title = routeTitles[path];
+  if (!title) {
+    if (path.startsWith('/subjects/')) title = 'تفاصيل المادة';
+    else if (path.startsWith('/notes/')) title = 'تفاصيل الملاحظة';
+    else if (path.startsWith('/files/')) title = 'ملفات المادة';
+    else if (path.startsWith('/flashcards/')) title = 'مجموعة البطاقات';
+    else if (path.startsWith('/quizzes/')) title = 'الاختبار الذاتي';
+    else title = 'هندسها';
+  }
+
+  const rightContainer = header.querySelector('.header-right');
+  if (rightContainer) {
+    rightContainer.innerHTML = `
+      <div style="display: flex; align-items: center; gap: 8px;">
+        ${!isHome ? `
+          <button id="header-back-btn" class="header-back-btn btn-ghost" aria-label="الرجوع" style="width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; background: transparent; color: var(--color-text);">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
+        ` : ''}
+        <h1 class="header-title" style="font-size: 18px; font-weight: 800; color: var(--color-primary); margin: 0; display: flex; align-items: center; gap: 6px;">
+          ${title}
+        </h1>
+      </div>
+    `;
+
+    const backBtn = rightContainer.querySelector('#header-back-btn');
+    if (backBtn) {
+      backBtn.addEventListener('click', () => {
+        if (window.history.length > 1) {
+          window.history.back();
+        } else {
+          location.hash = '#/home';
+        }
+      });
+    }
+  }
+}
+
+/**
  * Handle a route change: match the path, load the module, render the page.
  * @param {string} path - New path to navigate to
  * @param {boolean} [addToHistory=true] - Whether to add to history stack
@@ -266,6 +336,9 @@ async function handleRoute(path, addToHistory = true) {
   if (!path || path === '/') {
     path = DEFAULT_ROUTE;
   }
+
+  // Update dynamic app header title & back navigation
+  updateAppHeader(path);
 
   // Don't re-render if same path
   if (path === currentPath) return;

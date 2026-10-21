@@ -190,9 +190,29 @@ export function modal(titleOrConfig, contentArg, actionsArg = []) {
   overlay.appendChild(modalEl);
   document.body.appendChild(overlay);
 
-  requestAnimationFrame(() => overlay.classList.add('visible'));
+  // Lock body scroll while modal is active
+  const originalOverflow = document.body.style.overflow;
+  document.body.style.overflow = 'hidden';
+
+  function handleKeyDown(e) {
+    if (e.key === 'Escape' || e.key === 'Esc') {
+      e.preventDefault();
+      close();
+    }
+  }
+  document.addEventListener('keydown', handleKeyDown);
+
+  requestAnimationFrame(() => {
+    overlay.classList.add('visible');
+    const firstInput = modalEl.querySelector('input:not([type="hidden"]), select, textarea');
+    if (firstInput) {
+      firstInput.focus();
+    }
+  });
 
   function close() {
+    document.removeEventListener('keydown', handleKeyDown);
+    document.body.style.overflow = originalOverflow;
     overlay.style.pointerEvents = 'none';
     overlay.classList.remove('visible');
     setTimeout(() => overlay.remove(), 250);
@@ -264,12 +284,26 @@ export function bottomSheet(titleOrConfig, optionsArg = []) {
     overlay.appendChild(sheet);
     document.body.appendChild(overlay);
 
+    // Lock body scroll while bottom sheet is open
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    function handleKeyDown(e) {
+      if (e.key === 'Escape' || e.key === 'Esc') {
+        e.preventDefault();
+        cleanup(null);
+      }
+    }
+    document.addEventListener('keydown', handleKeyDown);
+
     requestAnimationFrame(() => {
       overlay.classList.add('visible');
       sheet.classList.add('visible');
     });
 
     const cleanup = (selectedId) => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = originalOverflow;
       overlay.style.pointerEvents = 'none';
       overlay.classList.remove('visible');
       sheet.classList.remove('visible');

@@ -163,7 +163,7 @@ export async function render(container) {
                     return `
                     <div class="task-card ${isDone ? 'completed' : ''}" data-id="${t.id}" style="border-right: 4px solid ${subjColor};">
                       <div class="task-main-row">
-                        <div class="task-checkbox ${isDone ? 'checked' : ''}" data-id="${t.id}" title="${isDone ? 'تحديد كغير مكتملة' : 'تحديد كمكتملة'}">
+                        <div class="task-checkbox ${isDone ? 'checked' : ''}" role="checkbox" aria-checked="${isDone ? 'true' : 'false'}" tabindex="0" data-id="${t.id}" aria-label="تحديد المهمة ${sanitizeHTML(t.title)} كمكتملة" title="${isDone ? 'تحديد كغير مكتملة' : 'تحديد كمكتملة'}">
                           ${isDone ? icon('check', 16) : ''}
                         </div>
                         <div class="task-info">
@@ -220,10 +220,10 @@ export async function render(container) {
       });
     });
 
-    // Checkbox toggle status
+    // Checkbox toggle status & keyboard accessibility
     container.querySelectorAll('.task-checkbox').forEach((chk) => {
-      chk.addEventListener('click', async (e) => {
-        e.stopPropagation();
+      const toggle = async (e) => {
+        if (e) e.stopPropagation();
         const tId = chk.dataset.id;
         const target = tasks.find((t) => t.id === tId);
         if (target) {
@@ -238,6 +238,14 @@ export async function render(container) {
           await update('tasks', target);
           toast(target.status === 'completed' ? '🎉 أحسنت! تم إكمال المهمة' : 'تم تغيير الحالة إلى قيد التنفيذ', 'success');
           renderView(data);
+        }
+      };
+
+      chk.addEventListener('click', toggle);
+      chk.addEventListener('keydown', (e) => {
+        if (e.key === ' ' || e.key === 'Enter') {
+          e.preventDefault();
+          toggle(e);
         }
       });
     });
@@ -374,6 +382,10 @@ export async function render(container) {
             finalDeadline = new Date(`${dDate}T${dTime}:00`).getTime();
           }
 
+          let estTime = parseInt(formData.get('estimatedTime'), 10);
+          if (isNaN(estTime) || estTime < 5) estTime = 45;
+          if (estTime > 1440) estTime = 1440;
+
           const payload = {
             title,
             subjectId: formData.get('subjectId') || '',
@@ -382,7 +394,7 @@ export async function render(container) {
             status: formData.get('status') || 'notStarted',
             details: formData.get('details')?.trim() || '',
             deadline: finalDeadline,
-            estimatedTime: Number(formData.get('estimatedTime')) || 0,
+            estimatedTime: estTime,
             completedAt: formData.get('status') === 'completed' ? (cur.completedAt || Date.now()) : null,
             createdAt: cur.createdAt || Date.now(),
             updatedAt: Date.now(),
