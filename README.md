@@ -5,6 +5,14 @@
 
 ---
 
+### 🌐 الرابط المباشر للتطبيق (Live App)
+**[https://elzaeemwork.github.io/handasha/](https://elzaeemwork.github.io/handasha/)**
+
+### 📦 مستودع الكود على GitHub
+**[https://github.com/elzaeemwork/handasha](https://github.com/elzaeemwork/handasha)**
+
+---
+
 ## 🌟 نظرة عامة | Overview
 
 **تطبيق هندسها (HANDASHA)** هو تطبيق ويب تقدمي (Progressive Web App - PWA) عملي متكامل، مخصص لطلاب الهندسة في الجامعات العراقية والعربية. يجمع التطبيق كل الأدوات الدراسية اليومية في منصة واحدة تعمل بكفاءة وسرعة فائقة على هواتف iPhone (عبر متصفح Safari PWA) والأجهزة الأخرى، دون الحاجة للاتصال بالإنترنت بعد أول تحميل.
