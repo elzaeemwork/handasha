@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1, user-scalable=no">
+
+  <!-- PWA Meta Tags -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="هندسها">
+  <meta name="theme-color" content="#3657C8">
+  <meta name="description" content="تطبيق دراسي ذكي لطلاب الهندسة">
+
+  <!-- Icons -->
+  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="assets/icons/icon.svg">
+  <link rel="manifest" href="manifest.webmanifest">
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/pages.css">
+
+  <title>هندسها | HANDASHA</title>
+</head>
+<body>
+  <div id="app">
+    <!-- App Header - dynamically updated by router -->
+    <header id="app-header" class="app-header">
+      <div class="header-right">
+        <h1 class="header-title">هندسها</h1>
+      </div>
+      <div class="header-left">
+        <!-- Dynamic action buttons injected by pages -->
+      </div>
+    </header>
+
+    <!-- Main Content Area - pages render here -->
+    <main id="app-content" class="app-content">
+      <!-- Page content injected by router -->
+    </main>
+
+    <!-- Floating Action Button -->
+    <button id="fab" class="fab" aria-label="إضافة جديد">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+        <line x1="12" y1="5" x2="12" y2="19"></line>
+        <line x1="5" y1="12" x2="19" y2="12"></line>
+      </svg>
+    </button>
+
+    <!-- Bottom Navigation -->
+    <nav id="bottom-nav" class="bottom-nav" aria-label="التنقل الرئيسي">
+      <button class="nav-tab active" data-tab="home" aria-label="الرئيسية" aria-current="page">
+        <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"></path>
+          <polyline points="9 21 9 14 15 14 15 21"></polyline>
+        </svg>
+        <span class="nav-label">الرئيسية</span>
+      </button>
+      <button class="nav-tab" data-tab="subjects" aria-label="المواد">
+        <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+          <line x1="8" y1="7" x2="16" y2="7"></line>
+          <line x1="8" y1="11" x2="13" y2="11"></line>
+        </svg>
+        <span class="nav-label">المواد</span>
+      </button>
+      <button class="nav-tab" data-tab="calendar" aria-label="التقويم">
+        <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="16" y1="2" x2="16" y2="6"></line>
+          <line x1="8" y1="2" x2="8" y2="6"></line>
+          <line x1="3" y1="10" x2="21" y2="10"></line>
+          <rect x="7" y="13" width="3" height="3" rx="0.5" fill="currentColor" opacity="0.3"></rect>
+          <rect x="14" y="13" width="3" height="3" rx="0.5" fill="currentColor" opacity="0.3"></rect>
+        </svg>
+        <span class="nav-label">التقويم</span>
+      </button>
+      <button class="nav-tab" data-tab="more" aria-label="المزيد">
+        <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="5" r="1.5" fill="currentColor"></circle>
+          <circle cx="12" cy="12" r="1.5" fill="currentColor"></circle>
+          <circle cx="12" cy="19" r="1.5" fill="currentColor"></circle>
+        </svg>
+        <span class="nav-label">المزيد</span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- Toast Notifications Container -->
+  <div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- Modal Container -->
+  <div id="modal-container" class="modal-container" aria-hidden="true">
+    <div class="modal-overlay"></div>
+    <div class="modal-content" role="dialog" aria-modal="true">
+      <div class="modal-header">
+        <h2 class="modal-title"></h2>
+        <button class="modal-close" aria-label="إغلاق">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body"></div>
+      <div class="modal-footer"></div>
+    </div>
+  </div>
+
+  <!-- Bottom Sheet Container -->
+  <div id="bottom-sheet-container" class="bottom-sheet-container" aria-hidden="true">
+    <div class="bottom-sheet-overlay"></div>
+    <div class="bottom-sheet" role="dialog" aria-modal="true">
+      <div class="bottom-sheet-handle"></div>
+      <div class="bottom-sheet-header">
+        <h3 class="bottom-sheet-title"></h3>
+      </div>
+      <div class="bottom-sheet-body"></div>
+    </div>
+  </div>
+
+  <!-- Onboarding Overlay (shown on first launch) -->
+  <div id="onboarding-overlay" class="onboarding-overlay" aria-hidden="true">
+    <div class="onboarding-content">
+      <div class="onboarding-slides">
+        <!-- Slide 1: Welcome -->
+        <div class="onboarding-slide active" data-slide="0">
+          <div class="onboarding-icon">
+            <img src="assets/icons/icon.svg" alt="هندسها" width="100" height="100">
+          </div>
+          <h2 class="onboarding-title">مرحباً بك في هندسها!</h2>
+          <p class="onboarding-text">رفيقك الدراسي الذكي لتنظيم حياتك الجامعية في الهندسة</p>
+        </div>
+        <!-- Slide 2: Features -->
+        <div class="onboarding-slide" data-slide="1">
+          <div class="onboarding-icon">
+            <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#3657C8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+            </svg>
+          </div>
+          <h2 class="onboarding-title">نظّم موادك ومهامك</h2>
+          <p class="onboarding-text">أضف موادك الدراسية، تابع محاضراتك ومهامك، وسجّل ملاحظاتك بسهولة</p>
+        </div>
+        <!-- Slide 3: Offline -->
+        <div class="onboarding-slide" data-slide="2">
+          <div class="onboarding-icon">
+            <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#24A58A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+              <path d="M2 17l10 5 10-5"></path>
+              <path d="M2 12l10 5 10-5"></path>
+            </svg>
+          </div>
+          <h2 class="onboarding-title">يعمل بدون إنترنت</h2>
+          <p class="onboarding-text">جميع بياناتك محفوظة على جهازك. لا حاجة لإنترنت بعد التثبيت</p>
+        </div>
+      </div>
+      <!-- Dots Indicator -->
+      <div class="onboarding-dots">
+        <span class="onboarding-dot active" data-dot="0"></span>
+        <span class="onboarding-dot" data-dot="1"></span>
+        <span class="onboarding-dot" data-dot="2"></span>
+      </div>
+      <!-- Actions -->
+      <div class="onboarding-actions">
+        <button id="onboarding-next" class="btn btn-primary onboarding-btn">التالي</button>
+        <button id="onboarding-skip" class="btn btn-text onboarding-skip">تخطي</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- App Entry Point -->
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

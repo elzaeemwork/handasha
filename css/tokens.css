@@ -1,0 +1,218 @@
+/* ============================================
+   HANDASHA Design Tokens
+   CSS Custom Properties for the entire app
+   ============================================ */
+
+:root {
+  /* ── Brand Colors ── */
+  --color-primary: #3657C8;
+  --color-primary-dark: #28449F;
+  --color-primary-light: #4A6AD8;
+  --color-primary-rgb: 54, 87, 200;
+  --color-primary-bg: rgba(54, 87, 200, 0.08);
+  --color-primary-bg-hover: rgba(54, 87, 200, 0.14);
+
+  --color-secondary: #24A58A;
+  --color-secondary-dark: #1C8A72;
+  --color-secondary-light: #2DBFA0;
+  --color-secondary-rgb: 36, 165, 138;
+  --color-secondary-bg: rgba(36, 165, 138, 0.08);
+
+  /* ── Semantic Colors ── */
+  --color-success: #258B68;
+  --color-success-light: #2AA876;
+  --color-success-bg: rgba(37, 139, 104, 0.10);
+  --color-warning: #E8A23A;
+  --color-warning-dark: #D48E2A;
+  --color-warning-bg: rgba(232, 162, 58, 0.10);
+  --color-error: #D9534F;
+  --color-error-dark: #C9433F;
+  --color-error-bg: rgba(217, 83, 79, 0.10);
+  --color-info: #3B82F6;
+  --color-info-bg: rgba(59, 130, 246, 0.10);
+
+  /* ── Surface Colors ── */
+  --color-bg: #F5F7FB;
+  --color-bg-secondary: #EEF1F7;
+  --color-surface: #FFFFFF;
+  --color-surface-raised: #FFFFFF;
+  --color-surface-overlay: rgba(0, 0, 0, 0.4);
+  --color-surface-sheet: #FFFFFF;
+
+  /* ── Text Colors ── */
+  --color-text: #202938;
+  --color-text-secondary: #748094;
+  --color-text-tertiary: #A0AEC0;
+  --color-text-inverse: #FFFFFF;
+  --color-text-link: #3657C8;
+  --color-text-on-primary: #FFFFFF;
+
+  /* ── Border Colors ── */
+  --color-border: #E5EAF2;
+  --color-border-light: #F0F3F8;
+  --color-border-focus: #3657C8;
+  --color-divider: #E5EAF2;
+
+  /* ── Typography ── */
+  --font-family: -apple-system, 'SF Pro Arabic', 'Segoe UI', Tahoma, 'Noto Sans Arabic', sans-serif;
+  --font-family-mono: 'SF Mono', 'Cascadia Code', 'Courier New', monospace;
+
+  /* Font sizes */
+  --text-xs: 0.6875rem;    /* 11px */
+  --text-sm: 0.8125rem;    /* 13px */
+  --text-base: 0.9375rem;  /* 15px */
+  --text-md: 1rem;         /* 16px */
+  --text-lg: 1.125rem;     /* 18px */
+  --text-xl: 1.3125rem;    /* 21px */
+  --text-2xl: 1.5rem;      /* 24px */
+  --text-3xl: 1.875rem;    /* 30px */
+  --text-4xl: 2.25rem;     /* 36px */
+
+  /* Font weights */
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+
+  /* Line heights */
+  --leading-tight: 1.25;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.75;
+
+  /* ── Spacing Scale (4px base) ── */
+  --space-0: 0;
+  --space-1: 0.25rem;   /* 4px */
+  --space-2: 0.5rem;    /* 8px */
+  --space-3: 0.75rem;   /* 12px */
+  --space-4: 1rem;      /* 16px */
+  --space-5: 1.25rem;   /* 20px */
+  --space-6: 1.5rem;    /* 24px */
+  --space-8: 2rem;      /* 32px */
+  --space-10: 2.5rem;   /* 40px */
+  --space-12: 3rem;     /* 48px */
+  --space-16: 4rem;     /* 64px */
+  --space-20: 5rem;     /* 80px */
+
+  /* ── Border Radius ── */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 20px;
+  --radius-full: 9999px;
+
+  /* ── Shadows ── */
+  --shadow-xs: 0 1px 2px rgba(32, 41, 56, 0.04);
+  --shadow-sm: 0 1px 3px rgba(32, 41, 56, 0.06), 0 1px 2px rgba(32, 41, 56, 0.04);
+  --shadow-md: 0 4px 6px rgba(32, 41, 56, 0.06), 0 2px 4px rgba(32, 41, 56, 0.04);
+  --shadow-lg: 0 10px 15px rgba(32, 41, 56, 0.08), 0 4px 6px rgba(32, 41, 56, 0.04);
+  --shadow-xl: 0 20px 25px rgba(32, 41, 56, 0.10), 0 8px 10px rgba(32, 41, 56, 0.04);
+  --shadow-inner: inset 0 2px 4px rgba(32, 41, 56, 0.06);
+  --shadow-focus: 0 0 0 3px rgba(54, 87, 200, 0.25);
+  --shadow-card: 0 1px 4px rgba(32, 41, 56, 0.05), 0 0 1px rgba(32, 41, 56, 0.08);
+  --shadow-card-hover: 0 4px 12px rgba(32, 41, 56, 0.10), 0 1px 3px rgba(32, 41, 56, 0.06);
+  --shadow-bottom-nav: 0 -1px 8px rgba(32, 41, 56, 0.08);
+  --shadow-fab: 0 4px 14px rgba(54, 87, 200, 0.35);
+  --shadow-toast: 0 6px 20px rgba(32, 41, 56, 0.15);
+
+  /* ── Transitions ── */
+  --transition-fast: 0.15s ease;
+  --transition-base: 0.2s ease;
+  --transition-slow: 0.3s ease;
+  --transition-spring: 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* ── Z-Index Scale ── */
+  --z-base: 0;
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-header: 300;
+  --z-overlay: 400;
+  --z-modal: 500;
+  --z-sheet: 600;
+  --z-toast: 700;
+  --z-fab: 350;
+  --z-bottom-nav: 300;
+  --z-tooltip: 800;
+
+  /* ── Safe Area Insets ── */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+
+  /* ── Layout Dimensions ── */
+  --header-height: 56px;
+  --bottom-nav-height: 56px;
+  --bottom-nav-total: calc(var(--bottom-nav-height) + var(--safe-bottom));
+  --fab-size: 56px;
+  --fab-bottom-offset: calc(var(--bottom-nav-total) + var(--space-4));
+  --page-padding-x: var(--space-4);
+  --page-padding-top: var(--space-4);
+  --page-padding-bottom: calc(var(--bottom-nav-total) + var(--space-6));
+  --max-content-width: 600px;
+  --touch-target-min: 44px;
+  --input-height: 48px;
+}
+
+/* ============================================
+   Dark Mode Overrides
+   ============================================ */
+[data-theme="dark"] {
+  --color-primary: #5B7AE5;
+  --color-primary-dark: #4A6AD8;
+  --color-primary-light: #7B96F0;
+  --color-primary-rgb: 91, 122, 229;
+  --color-primary-bg: rgba(91, 122, 229, 0.12);
+  --color-primary-bg-hover: rgba(91, 122, 229, 0.20);
+
+  --color-secondary: #2DBFA0;
+  --color-secondary-dark: #24A58A;
+  --color-secondary-light: #3DD4B3;
+  --color-secondary-rgb: 45, 191, 160;
+  --color-secondary-bg: rgba(45, 191, 160, 0.12);
+
+  --color-success: #34C88B;
+  --color-success-light: #3DD4B3;
+  --color-success-bg: rgba(52, 200, 139, 0.12);
+  --color-warning: #F0B454;
+  --color-warning-dark: #E8A23A;
+  --color-warning-bg: rgba(240, 180, 84, 0.12);
+  --color-error: #EF6B67;
+  --color-error-dark: #D9534F;
+  --color-error-bg: rgba(239, 107, 103, 0.12);
+  --color-info: #60A5FA;
+  --color-info-bg: rgba(96, 165, 250, 0.12);
+
+  --color-bg: #0F1318;
+  --color-bg-secondary: #161B23;
+  --color-surface: #1C222D;
+  --color-surface-raised: #232A37;
+  --color-surface-overlay: rgba(0, 0, 0, 0.6);
+  --color-surface-sheet: #1C222D;
+
+  --color-text: #E8ECF2;
+  --color-text-secondary: #8B95A5;
+  --color-text-tertiary: #5A6578;
+  --color-text-inverse: #202938;
+  --color-text-link: #5B7AE5;
+  --color-text-on-primary: #FFFFFF;
+
+  --color-border: #2A3140;
+  --color-border-light: #1E2530;
+  --color-border-focus: #5B7AE5;
+  --color-divider: #2A3140;
+
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.15);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.20), 0 1px 2px rgba(0, 0, 0, 0.15);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.20), 0 2px 4px rgba(0, 0, 0, 0.15);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.25), 0 4px 6px rgba(0, 0, 0, 0.15);
+  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.30), 0 8px 10px rgba(0, 0, 0, 0.15);
+  --shadow-inner: inset 0 2px 4px rgba(0, 0, 0, 0.20);
+  --shadow-focus: 0 0 0 3px rgba(91, 122, 229, 0.30);
+  --shadow-card: 0 1px 4px rgba(0, 0, 0, 0.12), 0 0 1px rgba(0, 0, 0, 0.20);
+  --shadow-card-hover: 0 4px 12px rgba(0, 0, 0, 0.25), 0 1px 3px rgba(0, 0, 0, 0.15);
+  --shadow-bottom-nav: 0 -1px 8px rgba(0, 0, 0, 0.25);
+  --shadow-fab: 0 4px 14px rgba(91, 122, 229, 0.40);
+  --shadow-toast: 0 6px 20px rgba(0, 0, 0, 0.35);
+}

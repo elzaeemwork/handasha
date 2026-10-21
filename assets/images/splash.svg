@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 600">
+  <defs>
+    <linearGradient id="splashBg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#F5F7FB"/>
+      <stop offset="100%" stop-color="#E8ECF5"/>
+    </linearGradient>
+  </defs>
+  <!-- Background -->
+  <rect width="400" height="600" fill="url(#splashBg)"/>
+  <!-- Icon (centered, scaled down from 512 to ~140) -->
+  <g transform="translate(130, 180) scale(0.273)">
+    <defs>
+      <linearGradient id="sBgGrad" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#2E4AAE"/>
+        <stop offset="100%" stop-color="#1E3580"/>
+      </linearGradient>
+    </defs>
+    <rect width="512" height="512" rx="96" ry="96" fill="url(#sBgGrad)"/>
+    <g transform="translate(110, 130)" stroke-linecap="round" stroke-linejoin="round">
+      <polygon points="60,0 160,0 160,100 60,100" fill="none" stroke="#3657C8" stroke-width="8" opacity="0.5"/>
+      <polygon points="20,50 120,50 120,150 20,150" fill="none" stroke="#3657C8" stroke-width="10"/>
+      <line x1="20" y1="50" x2="60" y2="0" stroke="#3657C8" stroke-width="8" opacity="0.7"/>
+      <line x1="120" y1="50" x2="160" y2="0" stroke="#3657C8" stroke-width="8" opacity="0.7"/>
+      <line x1="120" y1="150" x2="160" y2="100" stroke="#3657C8" stroke-width="8" opacity="0.7"/>
+      <polygon points="20,50 120,50 120,150 20,150" fill="#3657C8" opacity="0.15"/>
+      <polygon points="20,50 60,0 160,0 120,50" fill="#3657C8" opacity="0.25"/>
+      <polygon points="120,50 160,0 160,100 120,150" fill="#3657C8" opacity="0.2"/>
+    </g>
+    <g transform="translate(240, 170)">
+      <path d="M80,10 C60,5 20,0 0,15 L0,160 C20,145 60,148 80,155 Z" fill="white" opacity="0.95"/>
+      <path d="M80,10 C100,5 140,0 160,15 L160,160 C140,145 100,148 80,155 Z" fill="white" opacity="0.85"/>
+      <line x1="15" y1="45" x2="68" y2="40" stroke="#3657C8" stroke-width="3" opacity="0.3" stroke-linecap="round"/>
+      <line x1="15" y1="65" x2="68" y2="60" stroke="#3657C8" stroke-width="3" opacity="0.3" stroke-linecap="round"/>
+      <line x1="15" y1="85" x2="68" y2="80" stroke="#3657C8" stroke-width="3" opacity="0.3" stroke-linecap="round"/>
+      <line x1="92" y1="40" x2="145" y2="45" stroke="#24A58A" stroke-width="3" opacity="0.4" stroke-linecap="round"/>
+      <line x1="92" y1="60" x2="145" y2="65" stroke="#24A58A" stroke-width="3" opacity="0.4" stroke-linecap="round"/>
+      <line x1="92" y1="80" x2="145" y2="85" stroke="#24A58A" stroke-width="3" opacity="0.4" stroke-linecap="round"/>
+      <line x1="80" y1="10" x2="80" y2="155" stroke="#24A58A" stroke-width="4" stroke-linecap="round"/>
+    </g>
+  </g>
+  <!-- Arabic name -->
+  <text x="200" y="370" text-anchor="middle" font-family="-apple-system, 'SF Pro Arabic', 'Arial', sans-serif" font-size="38" font-weight="700" fill="#28449F">هندسها</text>
+  <!-- English name -->
+  <text x="200" y="405" text-anchor="middle" font-family="-apple-system, 'SF Pro Display', 'Arial', sans-serif" font-size="16" font-weight="500" fill="#3657C8" letter-spacing="4">HANDASHA</text>
+  <!-- Tagline -->
+  <text x="200" y="440" text-anchor="middle" font-family="-apple-system, 'SF Pro Arabic', 'Arial', sans-serif" font-size="14" fill="#6B7280">رفيقك الدراسي</text>
+  <!-- Loading dots -->
+  <g transform="translate(185, 500)">
+    <circle cx="0" cy="0" r="4" fill="#3657C8" opacity="0.3"/>
+    <circle cx="15" cy="0" r="4" fill="#3657C8" opacity="0.6"/>
+    <circle cx="30" cy="0" r="4" fill="#3657C8" opacity="1"/>
+  </g>
+</svg>
