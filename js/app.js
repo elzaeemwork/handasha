@@ -52,9 +52,14 @@ async function registerServiceWorker() {
 /**
  * Sync bottom navigation bar with current route.
  */
-function syncBottomNav(path) {
+function syncBottomNav(rawPath) {
   const nav = document.getElementById('bottom-nav');
   if (!nav) return;
+
+  let path = String(rawPath || '').trim();
+  if (path.startsWith('#')) path = path.slice(1);
+  if (!path.startsWith('/')) path = '/' + path;
+  if (path === '/' || !path) path = '/home';
 
   const tabs = nav.querySelectorAll('.nav-tab');
   let activeTab = 'home';
@@ -77,6 +82,9 @@ function syncBottomNav(path) {
     path.startsWith('/notifications')
   ) {
     activeTab = 'more';
+  } else {
+    // /home, /schedule, /tasks, /exams map to 'home'
+    activeTab = 'home';
   }
 
   tabs.forEach((tab) => {
@@ -101,19 +109,27 @@ function setupBottomNav() {
 
   const tabs = nav.querySelectorAll('.nav-tab');
   tabs.forEach((tab) => {
-    tab.addEventListener('click', () => {
+    tab.addEventListener('click', (e) => {
+      e.preventDefault();
       const target = tab.dataset.tab;
-      if (target === 'home') navigate('/home');
-      else if (target === 'subjects') navigate('/subjects');
-      else if (target === 'calendar') navigate('/calendar');
-      else if (target === 'more') navigate('/more');
+      const targetPath = '/' + target;
+      syncBottomNav(targetPath);
+      navigate(targetPath);
     });
   });
 
-  // Listen to hash changes to keep nav in sync
+  // Listen to route-changed from router.js (fired AFTER new page is loaded)
+  window.addEventListener('route-changed', (e) => {
+    if (e.detail?.path) {
+      syncBottomNav(e.detail.path);
+    }
+  });
+
+  // Listen to hash changes as instant fallback
   window.addEventListener('hashchange', () => {
-    const route = getCurrentRoute();
-    syncBottomNav(route);
+    const hash = window.location.hash || '';
+    const cleanPath = hash.replace(/^#/, '') || '/home';
+    syncBottomNav(cleanPath);
   });
 }
 

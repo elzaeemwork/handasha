@@ -1,143 +1,216 @@
 /**
- * calendar.js - التقويم
+ * calendar.js - التقويم الدراسي الشامل
  * Monthly calendar with events from schedule, tasks, exams, and reminders
+ * @module modules/calendar
  */
 
-import { add, get, getAll, update, remove, getAllFromIndex } from '../db/database.js';
+import { add, get, getAll, update, remove } from '../db/database.js';
 import { icon } from '../utils/icons.js';
 import { toast, confirm, modal, bottomSheet, emptyState, loadingSpinner } from '../utils/ui.js';
-import { formatDate, formatRelativeTime, getDayName, getMonthName, formatTime, getMonthCalendarGrid, isToday } from '../utils/dates.js';
+import {
+  formatDate,
+  formatRelativeTime,
+  getDayName,
+  getMonthName,
+  formatTime,
+  getMonthCalendarGrid,
+  isToday,
+  isSameDay,
+  toLocalISODate
+} from '../utils/dates.js';
 import { validateRequired, sanitizeHTML } from '../utils/validation.js';
 import { formatNumber } from '../utils/formatting.js';
 
-const ARABIC_DAYS = ['أحد', 'اثنين', 'ثلاثاء', 'أربعاء', 'خميس', 'جمعة', 'سبت'];
-const EVENT_TYPE_ICONS = {
-  schedule: 'calendar',
-  task: 'check-square',
-  exam: 'file-text',
-  reminder: 'bell'
-};
-const EVENT_TYPE_LABELS = {
-  schedule: 'محاضرة',
-  task: 'مهمة',
-  exam: 'اختبار',
-  reminder: 'تذكير'
+// Arabic week days starting from Saturday (matching getWeekStart)
+const ARABIC_WEEKDAYS = ['السبت', 'الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة'];
+
+const EVENT_TYPE_INFO = {
+  schedule: { label: 'محاضرة', iconName: 'calendar', defaultColor: '#3657C8', badgeClass: 'badge-primary' },
+  task: { label: 'واجب', iconName: 'check-square', defaultColor: '#E8A23A', badgeClass: 'badge-warning' },
+  exam: { label: 'امتحان', iconName: 'file-text', defaultColor: '#D9534F', badgeClass: 'badge-error' },
+  reminder: { label: 'تذكير', iconName: 'bell', defaultColor: '#24A58A', badgeClass: 'badge-success' }
 };
 
 let currentYear = new Date().getFullYear();
 let currentMonth = new Date().getMonth();
-let selectedDate = null;
+let selectedDate = new Date();
 let container = null;
 let allEvents = [];
+let subjectsMap = new Map();
 
+/**
+ * Main render function called by the SPA router.
+ * @param {HTMLElement} cont
+ * @param {Object} [params]
+ * @returns {Function} cleanup function
+ */
 export async function render(cont, params) {
   container = cont;
   const now = new Date();
   currentYear = now.getFullYear();
   currentMonth = now.getMonth();
-  selectedDate = null;
+  selectedDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
-  container.innerHTML = loadingSpinner();
-  allEvents = await loadAllEvents();
+  container.innerHTML = `
+    <div class="calendar-container">
+      <div style="padding: 40px 0; text-align: center;">${loadingSpinner()}</div>
+    </div>
+  `;
+
+  // FAB Event Listener
+  const fabHandler = (e) => {
+    if (e.detail?.action === 'add-reminder') {
+      const defaultDateStr = selectedDate ? toLocalISODate(selectedDate) : toLocalISODate(new Date());
+      showReminderForm(null, defaultDateStr);
+    }
+  };
+  window.addEventListener('fab-action', fabHandler);
+
+  await loadAllEvents();
   renderCalendar();
+
+  return () => {
+    window.removeEventListener('fab-action', fabHandler);
+  };
 }
 
+/**
+ * Load all events across schedules, tasks, exams, and reminders.
+ */
 async function loadAllEvents() {
-  const events = [];
+  allEvents = [];
+  subjectsMap = new Map();
 
   try {
-    const schedules = await getAll('schedule');
-    if (schedules && schedules.length) {
+    const subjects = await getAll('subjects').catch(() => []);
+    if (Array.isArray(subjects)) {
+      subjects.forEach((s) => {
+        if (s && s.id) subjectsMap.set(s.id, s);
+      });
+    }
+  } catch (err) {
+    console.warn('[CALENDAR] Failed to load subjects:', err);
+  }
+
+  // 1. Recurring weekly lectures from schedule
+  try {
+    const schedules = await getAll('schedule').catch(() => []);
+    if (Array.isArray(schedules)) {
       for (const s of schedules) {
-        const dWeek = s.dayOfWeek !== undefined ? s.dayOfWeek : s.day;
-        if (dWeek !== undefined && s.startTime) {
-          events.push({
+        const dWeek = s.dayOfWeek !== undefined ? Number(s.dayOfWeek) : Number(s.day);
+        if (!isNaN(dWeek)) {
+          const subj = s.subjectId ? subjectsMap.get(s.subjectId) : null;
+          allEvents.push({
             type: 'schedule',
-            title: s.title || s.subject || 'محاضرة',
-            time: s.startTime,
-            dayOfWeek: Number(dWeek),
+            title: s.title || (subj ? subj.name : 'محاضرة'),
+            time: s.startTime || s.time || '',
+            endTime: s.endTime || '',
+            hall: s.hall || s.room || s.location || '',
+            dayOfWeek: dWeek,
             recurring: true,
-            subjectColor: s.color || '#4ECDC4',
+            subjectName: subj?.name || s.title || 'محاضرة',
+            subjectColor: subj?.color || s.color || '#3657C8',
             raw: s
           });
         }
       }
     }
-  } catch (e) { /* store may not exist */ }
+  } catch (err) {
+    console.warn('[CALENDAR] Failed to load schedule:', err);
+  }
 
+  // 2. Tasks with deadlines
   try {
-    const tasks = await getAll('tasks');
-    if (tasks && tasks.length) {
+    const tasks = await getAll('tasks').catch(() => []);
+    if (Array.isArray(tasks)) {
       for (const t of tasks) {
-        if (t.deadline || t.dueDate) {
-          const dateStr = t.deadline || t.dueDate;
-          events.push({
+        const dateStr = t.deadline || t.dueDate;
+        if (dateStr) {
+          const subj = t.subjectId ? subjectsMap.get(t.subjectId) : null;
+          allEvents.push({
             type: 'task',
             title: t.title || 'مهمة',
-            date: dateStr,
+            date: dateStr.substring(0, 10),
             time: t.dueTime || t.time || '',
-            subjectColor: t.color || '#FFE66D',
+            status: t.status || 'pending',
+            priority: t.priority || 'medium',
+            subjectName: subj?.name || '',
+            subjectColor: subj?.color || '#E8A23A',
             raw: t
           });
         }
       }
     }
-  } catch (e) { /* store may not exist */ }
+  } catch (err) {
+    console.warn('[CALENDAR] Failed to load tasks:', err);
+  }
 
+  // 3. Exams
   try {
-    const exams = await getAll('exams');
-    if (exams && exams.length) {
+    const exams = await getAll('exams').catch(() => []);
+    if (Array.isArray(exams)) {
       for (const ex of exams) {
         if (ex.date) {
-          events.push({
+          const subj = ex.subjectId ? subjectsMap.get(ex.subjectId) : null;
+          allEvents.push({
             type: 'exam',
-            title: ex.title || ex.subject || 'اختبار',
-            date: ex.date,
+            title: ex.title || (subj ? `امتحان ${subj.name}` : 'امتحان'),
+            date: ex.date.substring(0, 10),
             time: ex.time || ex.startTime || '',
-            subjectColor: ex.color || '#FF6B6B',
+            hall: ex.hall || ex.room || '',
+            examType: ex.type || 'quiz',
+            subjectName: subj?.name || '',
+            subjectColor: subj?.color || '#D9534F',
             raw: ex
           });
         }
       }
     }
-  } catch (e) { /* store may not exist */ }
+  } catch (err) {
+    console.warn('[CALENDAR] Failed to load exams:', err);
+  }
 
+  // 4. Reminders
   try {
-    const reminders = await getAll('reminders');
-    if (reminders && reminders.length) {
+    const reminders = await getAll('reminders').catch(() => []);
+    if (Array.isArray(reminders)) {
       for (const r of reminders) {
         if (r.date) {
-          events.push({
+          allEvents.push({
             type: 'reminder',
-            title: r.title || 'تذكير',
-            date: r.date,
-            time: r.time || '',
-            subjectColor: r.color || '#C44DFF',
             id: r.id,
+            title: r.title || 'تذكير',
+            date: r.date.substring(0, 10),
+            time: r.time || '',
+            notes: r.notes || '',
+            subjectName: '',
+            subjectColor: '#24A58A',
             raw: r
           });
         }
       }
     }
-  } catch (e) { /* store may not exist */ }
-
-  return events;
+  } catch (err) {
+    console.warn('[CALENDAR] Failed to load reminders:', err);
+  }
 }
 
-function getEventsForDate(year, month, day) {
-  const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-  const dateObj = new Date(year, month, day);
-  const dayOfWeek = dateObj.getDay();
+/**
+ * Filter events for a given Date object.
+ * @param {Date} targetDate
+ * @returns {Array} events
+ */
+function getEventsForDate(targetDate) {
+  if (!targetDate || !(targetDate instanceof Date)) return [];
+  const dateIso = toLocalISODate(targetDate);
+  const dayOfWeek = targetDate.getDay();
   const result = [];
 
   for (const ev of allEvents) {
     if (ev.recurring && ev.dayOfWeek === dayOfWeek) {
       result.push(ev);
-    } else if (ev.date) {
-      const evDate = ev.date.substring(0, 10);
-      if (evDate === dateStr) {
-        result.push(ev);
-      }
+    } else if (ev.date && ev.date === dateIso) {
+      result.push(ev);
     }
   }
 
@@ -150,12 +223,13 @@ function getEventsForDate(year, month, day) {
   return result;
 }
 
-function hasEventsOnDate(year, month, day) {
-  return getEventsForDate(year, month, day).length > 0;
-}
-
-function getEventDotsForDate(year, month, day) {
-  const events = getEventsForDate(year, month, day);
+/**
+ * Get distinct event types present on a given Date.
+ * @param {Date} date
+ * @returns {string[]}
+ */
+function getEventDotsForDate(date) {
+  const events = getEventsForDate(date);
   const types = new Set();
   for (const ev of events) {
     types.add(ev.type);
@@ -163,46 +237,81 @@ function getEventDotsForDate(year, month, day) {
   return Array.from(types);
 }
 
+/**
+ * Render the whole monthly calendar view and event list.
+ */
 function renderCalendar() {
+  if (!container) return;
+
   const grid = getMonthCalendarGrid(currentYear, currentMonth);
-  const monthName = getMonthName(currentMonth);
+  const monthDate = new Date(currentYear, currentMonth, 1);
+  const monthName = getMonthName(monthDate);
+  const yearDisplay = formatNumber(currentYear);
 
   let html = `
-    <div class="calendar-page">
-      <div class="calendar-header">
-        <button class="cal-nav-btn" id="cal-next">${icon('chevron-right')}</button>
-        <h2 class="cal-month-title">${sanitizeHTML(monthName)} ${formatNumber(currentYear)}</h2>
-        <button class="cal-nav-btn" id="cal-prev">${icon('chevron-left')}</button>
-      </div>
-
-      <div class="calendar-grid">
-        <div class="cal-day-names">
-          ${ARABIC_DAYS.map(d => `<div class="cal-day-name">${d}</div>`).join('')}
+    <div class="calendar-container">
+      <!-- Calendar Card -->
+      <div class="calendar-card">
+        <!-- Calendar Header -->
+        <div class="calendar-header">
+          <div class="calendar-nav-group">
+            <button class="cal-nav-btn" id="cal-next" title="الشهر القادم" aria-label="الشهر القادم">
+              ${icon('chevron-right', 20)}
+            </button>
+            <button class="cal-today-btn" id="cal-today">اليوم</button>
+          </div>
+          <h2 class="calendar-month-title">
+            <span>${sanitizeHTML(monthName)}</span>
+            <span>${yearDisplay}</span>
+          </h2>
+          <div class="calendar-nav-group">
+            <button class="cal-nav-btn" id="cal-prev" title="الشهر السابق" aria-label="الشهر السابق">
+              ${icon('chevron-left', 20)}
+            </button>
+          </div>
         </div>
-        <div class="cal-days">
+
+        <!-- Weekdays Header Row -->
+        <div class="calendar-weekdays">
+          ${ARABIC_WEEKDAYS.map((d) => `<div class="calendar-weekday">${d}</div>`).join('')}
+        </div>
+
+        <!-- Calendar Days Grid (6 weeks x 7 days) -->
+        <div class="calendar-grid">
   `;
 
   for (const week of grid) {
-    for (const cell of week) {
-      if (!cell || cell.day === 0) {
-        html += `<div class="cal-day cal-day-empty"></div>`;
-      } else {
-        const isTodayClass = isToday(new Date(currentYear, currentMonth, cell.day)) ? 'cal-day-today' : '';
-        const isSelected = selectedDate &&
-          selectedDate.year === currentYear &&
-          selectedDate.month === currentMonth &&
-          selectedDate.day === cell.day ? 'cal-day-selected' : '';
-        const dots = getEventDotsForDate(currentYear, currentMonth, cell.day);
-        const dotsHtml = dots.length > 0 ? `<div class="cal-dots">${dots.map(t => {
-          const colorMap = { schedule: '#4ECDC4', task: '#FFE66D', exam: '#FF6B6B', reminder: '#C44DFF' };
-          return `<span class="cal-dot" style="background:${colorMap[t] || '#999'}"></span>`;
-        }).join('')}</div>` : '';
+    for (const cellDate of week) {
+      const isCurrentMonth = cellDate.getMonth() === currentMonth;
+      const isTodayCell = isToday(cellDate);
+      const isSelectedCell = selectedDate && isSameDay(cellDate, selectedDate);
+      const dots = getEventDotsForDate(cellDate);
 
-        html += `<div class="cal-day ${isTodayClass} ${isSelected}" data-day="${cell.day}">
-          <span class="cal-day-num">${formatNumber(cell.day)}</span>
+      const classes = [
+        'calendar-day-cell',
+        isCurrentMonth ? '' : 'other-month',
+        isTodayCell ? 'today' : '',
+        isSelectedCell ? 'selected' : ''
+      ].filter(Boolean).join(' ');
+
+      const cellIso = toLocalISODate(cellDate);
+      const dayNum = formatNumber(cellDate.getDate());
+
+      const dotsHtml = dots.length > 0
+        ? `<div class="calendar-dots">${dots
+            .map((t) => {
+              const color = EVENT_TYPE_INFO[t]?.defaultColor || '#999';
+              return `<span class="calendar-dot" style="background:${color};"></span>`;
+            })
+            .join('')}</div>`
+        : '';
+
+      html += `
+        <div class="${classes}" data-date="${cellIso}">
+          <span class="calendar-day-number">${dayNum}</span>
           ${dotsHtml}
-        </div>`;
-      }
+        </div>
+      `;
     }
   }
 
@@ -210,14 +319,9 @@ function renderCalendar() {
         </div>
       </div>
 
-      <div class="cal-actions">
-        <button class="btn btn-primary btn-sm" id="cal-add-reminder">
-          ${icon('plus')} إضافة تذكير
-        </button>
-      </div>
-
-      <div class="cal-events-section" id="cal-events-section">
-        ${selectedDate ? renderDayEvents() : '<p class="cal-hint">اضغط على يوم لعرض أحداثه</p>'}
+      <!-- Selected Day Events Section -->
+      <div class="calendar-events-section" id="cal-events-section">
+        ${renderDayEvents()}
       </div>
     </div>
   `;
@@ -226,53 +330,87 @@ function renderCalendar() {
   bindCalendarEvents();
 }
 
+/**
+ * Render events list for the currently selected date.
+ */
 function renderDayEvents() {
-  if (!selectedDate) return '';
-  const events = getEventsForDate(selectedDate.year, selectedDate.month, selectedDate.day);
-  const dateStr = `${selectedDate.year}-${String(selectedDate.month + 1).padStart(2, '0')}-${String(selectedDate.day).padStart(2, '0')}`;
-  const dateObj = new Date(selectedDate.year, selectedDate.month, selectedDate.day);
-  const dayName = getDayName(dateObj.getDay());
+  if (!selectedDate) {
+    return `<div class="calendar-empty-card"><p>اضغط على يوم في التقويم لعرض جدول المحاضرات والمهام.</p></div>`;
+  }
 
-  let html = `<h3 class="cal-events-title">${sanitizeHTML(dayName)} - ${formatDate(dateStr)}</h3>`;
+  const events = getEventsForDate(selectedDate);
+  const formattedDateStr = formatDate(selectedDate);
+
+  let html = `
+    <div class="calendar-events-header">
+      <h3 class="calendar-events-title">
+        ${icon('calendar', 18)} ${formattedDateStr}
+      </h3>
+      <button class="btn btn-primary btn-sm" id="cal-add-reminder">
+        ${icon('plus', 16)} إضافة تذكير
+      </button>
+    </div>
+  `;
 
   if (events.length === 0) {
-    html += `<p class="cal-no-events">لا توجد أحداث في هذا اليوم</p>`;
+    html += `
+      <div class="calendar-empty-card">
+        <div style="font-size: 32px; opacity: 0.6;">🏖️</div>
+        <p style="margin: 0; font-weight: 600; color: var(--color-text);">لا توجد أحداث أو مهام في هذا اليوم</p>
+        <span style="font-size: 13px; color: var(--color-text-secondary);">يمكنك إضافة تذكير شخصي أو الاستراحة!</span>
+      </div>
+    `;
     return html;
   }
 
-  html += `<div class="cal-events-list">`;
+  html += `<div class="calendar-events-list">`;
   for (const ev of events) {
-    const typeIcon = EVENT_TYPE_ICONS[ev.type] || 'circle';
-    const typeLabel = EVENT_TYPE_LABELS[ev.type] || ev.type;
-    const timeDisplay = ev.time ? formatTime(ev.time) : '';
+    const info = EVENT_TYPE_INFO[ev.type] || {
+      label: ev.type,
+      iconName: 'circle',
+      defaultColor: '#3657C8',
+      badgeClass: 'badge-neutral'
+    };
+    const accentColor = ev.subjectColor || info.defaultColor;
+    const timeDisplay = ev.time ? (ev.endTime ? `${ev.time} - ${ev.endTime}` : ev.time) : '';
     const isReminder = ev.type === 'reminder';
 
     html += `
-      <div class="cal-event-card" style="border-right: 3px solid ${ev.subjectColor}">
-        <div class="cal-event-icon" style="color: ${ev.subjectColor}">${icon(typeIcon)}</div>
-        <div class="cal-event-info">
-          <div class="cal-event-title">${sanitizeHTML(ev.title)}</div>
-          <div class="cal-event-meta">
-            <span class="cal-event-type">${sanitizeHTML(typeLabel)}</span>
-            ${timeDisplay ? `<span class="cal-event-time">${timeDisplay}</span>` : ''}
+      <div class="calendar-event-card" style="border-right: 4px solid ${accentColor};">
+        <div class="calendar-event-icon" style="background: ${accentColor}18; color: ${accentColor};">
+          ${icon(info.iconName, 20)}
+        </div>
+        <div class="calendar-event-info">
+          <div class="calendar-event-title">${sanitizeHTML(ev.title)}</div>
+          <div class="calendar-event-meta">
+            <span class="badge ${info.badgeClass} calendar-event-badge">${info.label}</span>
+            ${ev.subjectName ? `<span>${sanitizeHTML(ev.subjectName)}</span>` : ''}
+            ${timeDisplay ? `<span>⏰ ${timeDisplay}</span>` : ''}
+            ${ev.hall ? `<span>📍 ${sanitizeHTML(ev.hall)}</span>` : ''}
+            ${ev.notes ? `<span>📝 ${sanitizeHTML(ev.notes)}</span>` : ''}
           </div>
         </div>
         ${isReminder ? `
-          <div class="cal-event-actions">
-            <button class="btn-icon cal-edit-reminder" data-id="${ev.id}" title="تعديل">${icon('edit')}</button>
-            <button class="btn-icon cal-delete-reminder" data-id="${ev.id}" title="حذف">${icon('trash')}</button>
+          <div class="calendar-event-actions">
+            <button class="cal-event-btn cal-edit-reminder" data-id="${ev.id}" title="تعديل" aria-label="تعديل">${icon('edit', 18)}</button>
+            <button class="cal-event-btn danger cal-delete-reminder" data-id="${ev.id}" title="حذف" aria-label="حذف">${icon('trash', 18)}</button>
           </div>
         ` : ''}
       </div>
     `;
   }
   html += `</div>`;
+
   return html;
 }
 
+/**
+ * Bind DOM click handlers for navigation, date selection, reminders.
+ */
 function bindCalendarEvents() {
   const prevBtn = container.querySelector('#cal-prev');
   const nextBtn = container.querySelector('#cal-next');
+  const todayBtn = container.querySelector('#cal-today');
   const addReminderBtn = container.querySelector('#cal-add-reminder');
 
   if (prevBtn) {
@@ -297,26 +435,46 @@ function bindCalendarEvents() {
     });
   }
 
-  if (addReminderBtn) {
-    addReminderBtn.addEventListener('click', () => {
-      const defaultDate = selectedDate
-        ? `${selectedDate.year}-${String(selectedDate.month + 1).padStart(2, '0')}-${String(selectedDate.day).padStart(2, '0')}`
-        : new Date().toISOString().substring(0, 10);
-      showReminderForm(null, defaultDate);
+  if (todayBtn) {
+    todayBtn.addEventListener('click', () => {
+      const now = new Date();
+      currentYear = now.getFullYear();
+      currentMonth = now.getMonth();
+      selectedDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      renderCalendar();
     });
   }
 
-  const dayCells = container.querySelectorAll('.cal-day[data-day]');
-  dayCells.forEach(cell => {
+  if (addReminderBtn) {
+    addReminderBtn.addEventListener('click', () => {
+      const defaultDateStr = selectedDate ? toLocalISODate(selectedDate) : toLocalISODate(new Date());
+      showReminderForm(null, defaultDateStr);
+    });
+  }
+
+  // Day cell click handlers
+  const dayCells = container.querySelectorAll('.calendar-day-cell[data-date]');
+  dayCells.forEach((cell) => {
     cell.addEventListener('click', () => {
-      const day = parseInt(cell.dataset.day, 10);
-      selectedDate = { year: currentYear, month: currentMonth, day };
-      renderCalendar();
+      const dateStr = cell.dataset.date;
+      if (dateStr) {
+        const parts = dateStr.split('-').map(Number);
+        selectedDate = new Date(parts[0], parts[1] - 1, parts[2]);
+
+        // If clicked day is from another month, transition to that month
+        if (selectedDate.getMonth() !== currentMonth) {
+          currentYear = selectedDate.getFullYear();
+          currentMonth = selectedDate.getMonth();
+        }
+
+        renderCalendar();
+      }
     });
   });
 
+  // Reminder Edit Buttons
   const editBtns = container.querySelectorAll('.cal-edit-reminder');
-  editBtns.forEach(btn => {
+  editBtns.forEach((btn) => {
     btn.addEventListener('click', async (e) => {
       e.stopPropagation();
       const id = btn.dataset.id;
@@ -331,84 +489,104 @@ function bindCalendarEvents() {
     });
   });
 
+  // Reminder Delete Buttons
   const deleteBtns = container.querySelectorAll('.cal-delete-reminder');
-  deleteBtns.forEach(btn => {
+  deleteBtns.forEach((btn) => {
     btn.addEventListener('click', async (e) => {
       e.stopPropagation();
       const id = btn.dataset.id;
-      const confirmed = await confirm('هل تريد حذف هذا التذكير؟');
+      const confirmed = await confirm('حذف التذكير', 'هل أنت متأكد من رغبتك في حذف هذا التذكير؟', 'حذف', 'إلغاء', true);
       if (confirmed) {
         try {
           await remove('reminders', id);
-          allEvents = await loadAllEvents();
-          toast('تم حذف التذكير', 'success');
+          await loadAllEvents();
+          toast('تم حذف التذكير بنجاح', 'success');
           renderCalendar();
         } catch (err) {
-          toast('حدث خطأ أثناء الحذف', 'error');
+          toast('حدث خطأ أثناء حذف التذكير', 'error');
         }
       }
     });
   });
 }
 
+/**
+ * Open form modal to create or update a reminder.
+ * @param {Object} [existing]
+ * @param {string} [defaultDate]
+ */
 function showReminderForm(existing, defaultDate) {
   const isEdit = !!existing;
-  const title = isEdit ? 'تعديل التذكير' : 'إضافة تذكير';
+  const title = isEdit ? 'تعديل التذكير' : 'إضافة تذكير جديد';
 
-  const content = `
-    <form id="reminder-form" class="form">
-      <div class="form-group">
-        <label class="form-label">العنوان <span class="required">*</span></label>
-        <input type="text" id="reminder-title" class="form-input" value="${isEdit ? sanitizeHTML(existing.title || '') : ''}" placeholder="عنوان التذكير" required>
+  const initialDate = existing?.date || defaultDate || toLocalISODate(new Date());
+  const initialTime = existing?.time || '';
+  const initialTitle = existing?.title || '';
+  const initialNotes = existing?.notes || '';
+
+  const formEl = document.createElement('form');
+  formEl.id = 'reminder-form';
+  formEl.className = 'form';
+  formEl.style.cssText = 'display: flex; flex-direction: column; gap: 14px;';
+  formEl.innerHTML = `
+    <div class="form-group" style="margin: 0;">
+      <label class="form-label" style="display: block; font-size: 14px; font-weight: 600; color: var(--color-text); margin-bottom: 6px;">
+        عنوان التذكير <span style="color: var(--color-danger, #D9534F);">*</span>
+      </label>
+      <input type="text" id="reminder-title" class="form-input" value="${sanitizeHTML(initialTitle)}" placeholder="مثال: تسليم تقرير المختبر" required autofocus />
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+      <div class="form-group" style="margin: 0;">
+        <label class="form-label" style="display: block; font-size: 14px; font-weight: 600; color: var(--color-text); margin-bottom: 6px;">
+          التاريخ <span style="color: var(--color-danger, #D9534F);">*</span>
+        </label>
+        <input type="date" id="reminder-date" class="form-input" value="${initialDate}" required />
       </div>
-      <div class="form-group">
-        <label class="form-label">التاريخ <span class="required">*</span></label>
-        <input type="date" id="reminder-date" class="form-input" value="${isEdit ? (existing.date || '') : (defaultDate || '')}" required>
+      <div class="form-group" style="margin: 0;">
+        <label class="form-label" style="display: block; font-size: 14px; font-weight: 600; color: var(--color-text); margin-bottom: 6px;">
+          الوقت
+        </label>
+        <input type="time" id="reminder-time" class="form-input" value="${initialTime}" />
       </div>
-      <div class="form-group">
-        <label class="form-label">الوقت</label>
-        <input type="time" id="reminder-time" class="form-input" value="${isEdit ? (existing.time || '') : ''}">
-      </div>
-      <div class="form-group">
-        <label class="form-label">ملاحظات</label>
-        <textarea id="reminder-notes" class="form-input form-textarea" rows="3" placeholder="ملاحظات إضافية...">${isEdit ? sanitizeHTML(existing.notes || '') : ''}</textarea>
-      </div>
-      <div class="form-actions">
-        <button type="submit" class="btn btn-primary">${isEdit ? 'تحديث' : 'إضافة'}</button>
-        <button type="button" class="btn btn-secondary" id="reminder-cancel">إلغاء</button>
-      </div>
-    </form>
+    </div>
+
+    <div class="form-group" style="margin: 0;">
+      <label class="form-label" style="display: block; font-size: 14px; font-weight: 600; color: var(--color-text); margin-bottom: 6px;">
+        ملاحظات إضافية
+      </label>
+      <textarea id="reminder-notes" class="form-input form-textarea" rows="3" placeholder="أي تفاصيل تود تذكرها...">${sanitizeHTML(initialNotes)}</textarea>
+    </div>
   `;
 
-  const modalEl = modal(title, content);
-
-  const form = document.getElementById('reminder-form');
-  const cancelBtn = document.getElementById('reminder-cancel');
-
-  if (cancelBtn) {
-    cancelBtn.addEventListener('click', () => {
-      if (modalEl && typeof modalEl.close === 'function') modalEl.close();
-      else document.querySelector('.modal-overlay')?.remove();
-    });
-  }
-
-  if (form) {
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const titleVal = document.getElementById('reminder-title').value.trim();
-      const dateVal = document.getElementById('reminder-date').value;
-      const timeVal = document.getElementById('reminder-time').value;
-      const notesVal = document.getElementById('reminder-notes').value.trim();
+  modal({
+    title,
+    content: formEl,
+    confirmText: isEdit ? 'حفظ التعديلات' : 'إضافة',
+    cancelText: 'إلغاء',
+    onConfirm: async () => {
+      const titleVal = formEl.querySelector('#reminder-title').value.trim();
+      const dateVal = formEl.querySelector('#reminder-date').value;
+      const timeVal = formEl.querySelector('#reminder-time').value;
+      const notesVal = formEl.querySelector('#reminder-notes').value.trim();
 
       const tCheck = validateRequired(titleVal, 'عنوان التذكير');
       if (!tCheck.valid) {
         toast(tCheck.error, 'warning');
-        return;
+        return false;
       }
-      const dCheck = validateRequired(dateVal, 'التاريخ');
+
+      const dCheck = validateRequired(dateVal, 'تاريخ التذكير');
       if (!dCheck.valid) {
         toast(dCheck.error, 'warning');
-        return;
+        return false;
+      }
+
+      // Compute remindAt timestamp
+      let remindAt = null;
+      if (dateVal) {
+        const timePart = timeVal || '09:00';
+        remindAt = new Date(`${dateVal}T${timePart}:00`).getTime();
       }
 
       const reminderData = {
@@ -416,29 +594,36 @@ function showReminderForm(existing, defaultDate) {
         date: dateVal,
         time: timeVal || '',
         notes: notesVal,
-        fired: false,
+        remindAt: remindAt || Date.now(),
+        isFired: false,
         updatedAt: new Date().toISOString()
       };
 
       try {
         if (isEdit) {
           await update('reminders', { ...existing, ...reminderData });
-          toast('تم تحديث التذكير', 'success');
+          toast('تم تحديث التذكير بنجاح', 'success');
         } else {
-          reminderData.id = Date.now().toString(36) + Math.random().toString(36).substring(2, 7);
+          reminderData.id = 'rem_' + Date.now().toString(36) + Math.random().toString(36).substring(2, 6);
           reminderData.createdAt = new Date().toISOString();
           await add('reminders', reminderData);
-          toast('تم إضافة التذكير', 'success');
+          toast('تمت إضافة التذكير بنجاح', 'success');
         }
 
-        if (modalEl && typeof modalEl.close === 'function') modalEl.close();
-        else document.querySelector('.modal-overlay')?.remove();
+        // Set selectedDate to the reminder's date so user immediately sees it
+        const parts = dateVal.split('-').map(Number);
+        selectedDate = new Date(parts[0], parts[1] - 1, parts[2]);
+        currentYear = selectedDate.getFullYear();
+        currentMonth = selectedDate.getMonth();
 
-        allEvents = await loadAllEvents();
+        await loadAllEvents();
         renderCalendar();
+        return true;
       } catch (err) {
-        toast('حدث خطأ أثناء الحفظ', 'error');
+        console.error('Error saving reminder:', err);
+        toast('حدث خطأ أثناء حفظ التذكير', 'error');
+        return false;
       }
-    });
-  }
+    }
+  });
 }

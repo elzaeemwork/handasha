@@ -3,7 +3,7 @@
  * Handles caching, offline support, and app shell management.
  */
 
-const CACHE_NAME = 'handasha-v3';
+const CACHE_NAME = 'handasha-v4';
 
 // App shell files to cache on install
 const APP_SHELL_FILES = [

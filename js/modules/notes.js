@@ -197,6 +197,10 @@ async function renderNotesList(container) {
 
   const initialData = await loadData();
   renderView(initialData);
+
+  return () => {
+    window.removeEventListener('fab-action', fabHandler);
+  };
 }
 
 async function renderNoteEditor(container, noteId) {

@@ -89,6 +89,7 @@ export function confirm(title, message, confirmText = 'تأكيد', cancelText =
     requestAnimationFrame(() => overlay.classList.add('visible'));
 
     const cleanup = (result) => {
+      overlay.style.pointerEvents = 'none';
       overlay.classList.remove('visible');
       setTimeout(() => overlay.remove(), 200);
       resolve(result);
@@ -192,6 +193,7 @@ export function modal(titleOrConfig, contentArg, actionsArg = []) {
   requestAnimationFrame(() => overlay.classList.add('visible'));
 
   function close() {
+    overlay.style.pointerEvents = 'none';
     overlay.classList.remove('visible');
     setTimeout(() => overlay.remove(), 250);
   }
@@ -206,11 +208,23 @@ export function modal(titleOrConfig, contentArg, actionsArg = []) {
 
 /**
  * Slide-up Bottom Sheet (Action Sheet).
- * @param {string} title - Sheet title
- * @param {Array<{id: string, label: string, icon?: string, danger?: boolean}>} options
+ * Supports both (title, options) and ({ title, items, options }).
+ * @param {string|Object} titleOrConfig - Sheet title or configuration object
+ * @param {Array<{id?: string, label: string, icon?: string, danger?: boolean, onClick?: Function}>} [optionsArg=[]]
  * @returns {Promise<string|null>} Resolves to selected option id or null if dismissed
  */
-export function bottomSheet(title, options) {
+export function bottomSheet(titleOrConfig, optionsArg = []) {
+  let title = '';
+  let options = [];
+
+  if (typeof titleOrConfig === 'object' && titleOrConfig !== null && !Array.isArray(titleOrConfig)) {
+    title = titleOrConfig.title || '';
+    options = titleOrConfig.items || titleOrConfig.options || [];
+  } else {
+    title = String(titleOrConfig || '');
+    options = Array.isArray(optionsArg) ? optionsArg : [];
+  }
+
   return new Promise((resolve) => {
     const overlay = document.createElement('div');
     overlay.className = 'sheet-overlay';
@@ -220,12 +234,17 @@ export function bottomSheet(title, options) {
 
     let optionsHTML = options
       .map(
-        (opt) => `
-        <button class="sheet-item ${opt.danger ? 'sheet-item-danger' : ''}" data-id="${opt.id}">
-          ${opt.icon ? `<span class="sheet-item-icon">${icon(opt.icon, 20)}</span>` : ''}
-          <span class="sheet-item-text">${sanitizeHTML(opt.label)}</span>
-        </button>
-      `
+        (opt, idx) => {
+          const optId = opt.id !== undefined ? opt.id : `opt-${idx}`;
+          const isIconSvg = opt.icon && typeof opt.icon === 'string' && opt.icon.trim().startsWith('<svg');
+          const iconMarkup = opt.icon ? (isIconSvg ? opt.icon : icon(opt.icon, 20)) : '';
+          return `
+            <button class="sheet-item ${opt.danger ? 'sheet-item-danger' : ''}" data-id="${optId}" data-index="${idx}">
+              ${iconMarkup ? `<span class="sheet-item-icon">${iconMarkup}</span>` : ''}
+              <span class="sheet-item-text">${sanitizeHTML(opt.label || opt.text || '')}</span>
+            </button>
+          `;
+        }
       )
       .join('');
 
@@ -251,6 +270,7 @@ export function bottomSheet(title, options) {
     });
 
     const cleanup = (selectedId) => {
+      overlay.style.pointerEvents = 'none';
       overlay.classList.remove('visible');
       sheet.classList.remove('visible');
       setTimeout(() => overlay.remove(), 250);
@@ -259,6 +279,15 @@ export function bottomSheet(title, options) {
 
     sheet.querySelectorAll('.sheet-item').forEach((item) => {
       item.addEventListener('click', () => {
+        const idx = parseInt(item.dataset.index, 10);
+        const opt = options[idx];
+        if (opt && typeof opt.onClick === 'function') {
+          try {
+            opt.onClick();
+          } catch (err) {
+            console.error('Error in sheet item onClick:', err);
+          }
+        }
         cleanup(item.dataset.id);
       });
     });

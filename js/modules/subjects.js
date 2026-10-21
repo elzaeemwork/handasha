@@ -669,9 +669,21 @@ async function renderSubjectDetail(container, subjectId) {
  */
 export async function render(container, params) {
   const subjectId = params?.id;
+
+  const fabHandler = (e) => {
+    if (e.detail?.action === 'add-subject') {
+      showSubjectForm(null, () => renderSubjectList(container));
+    }
+  };
+  window.addEventListener('fab-action', fabHandler);
+
   if (subjectId) {
     await renderSubjectDetail(container, subjectId);
   } else {
     await renderSubjectList(container);
   }
+
+  return () => {
+    window.removeEventListener('fab-action', fabHandler);
+  };
 }
