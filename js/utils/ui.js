@@ -281,17 +281,21 @@ export function emptyState(iconName, title, description, actionText, actionFn) {
 }
 
 /**
- * Render loading spinner markup.
+ * Render loading spinner markup. Supports both DOM Node (appendChild) and HTML string (innerHTML).
  * @param {string} [text='جاري التحميل...']
- * @returns {string}
+ * @returns {HTMLElement}
  */
 export function loadingSpinner(text = 'جاري التحميل...') {
-  return `
-    <div class="loading-container">
-      <div class="spinner"></div>
-      <p class="loading-text">${sanitizeHTML(text)}</p>
-    </div>
+  const container = document.createElement('div');
+  container.className = 'loading-container';
+  container.innerHTML = `
+    <div class="spinner"></div>
+    <p class="loading-text">${sanitizeHTML(text)}</p>
   `;
+  container.toString = function () {
+    return this.outerHTML;
+  };
+  return container;
 }
 
 /**

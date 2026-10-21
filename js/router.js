@@ -261,6 +261,7 @@ function showError(container, error) {
  * @param {boolean} [addToHistory=true] - Whether to add to history stack
  */
 async function handleRoute(path, addToHistory = true) {
+  console.log('[ROUTER] handleRoute called with path:', path);
   // Normalize path
   if (!path || path === '/') {
     path = DEFAULT_ROUTE;
@@ -434,9 +435,8 @@ export function initRouter() {
   // Set the hash if not present
   if (!window.location.hash || window.location.hash === '#' || window.location.hash === '#/') {
     window.location.hash = '#' + DEFAULT_ROUTE;
-  } else {
-    handleRoute(initialPath);
   }
+  handleRoute(initialPath);
 }
 
 /**

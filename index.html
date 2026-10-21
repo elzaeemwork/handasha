@@ -26,7 +26,7 @@
   <title>هندسها | HANDASHA</title>
 </head>
 <body>
-  <div id="app">
+  <div id="app" class="app-shell">
     <!-- App Header - dynamically updated by router -->
     <header id="app-header" class="app-header">
       <div class="header-right">
@@ -92,86 +92,6 @@
 
   <!-- Toast Notifications Container -->
   <div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="true"></div>
-
-  <!-- Modal Container -->
-  <div id="modal-container" class="modal-container" aria-hidden="true">
-    <div class="modal-overlay"></div>
-    <div class="modal-content" role="dialog" aria-modal="true">
-      <div class="modal-header">
-        <h2 class="modal-title"></h2>
-        <button class="modal-close" aria-label="إغلاق">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
-          </svg>
-        </button>
-      </div>
-      <div class="modal-body"></div>
-      <div class="modal-footer"></div>
-    </div>
-  </div>
-
-  <!-- Bottom Sheet Container -->
-  <div id="bottom-sheet-container" class="bottom-sheet-container" aria-hidden="true">
-    <div class="bottom-sheet-overlay"></div>
-    <div class="bottom-sheet" role="dialog" aria-modal="true">
-      <div class="bottom-sheet-handle"></div>
-      <div class="bottom-sheet-header">
-        <h3 class="bottom-sheet-title"></h3>
-      </div>
-      <div class="bottom-sheet-body"></div>
-    </div>
-  </div>
-
-  <!-- Onboarding Overlay (shown on first launch) -->
-  <div id="onboarding-overlay" class="onboarding-overlay" aria-hidden="true">
-    <div class="onboarding-content">
-      <div class="onboarding-slides">
-        <!-- Slide 1: Welcome -->
-        <div class="onboarding-slide active" data-slide="0">
-          <div class="onboarding-icon">
-            <img src="assets/icons/icon.svg" alt="هندسها" width="100" height="100">
-          </div>
-          <h2 class="onboarding-title">مرحباً بك في هندسها!</h2>
-          <p class="onboarding-text">رفيقك الدراسي الذكي لتنظيم حياتك الجامعية في الهندسة</p>
-        </div>
-        <!-- Slide 2: Features -->
-        <div class="onboarding-slide" data-slide="1">
-          <div class="onboarding-icon">
-            <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#3657C8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
-            </svg>
-          </div>
-          <h2 class="onboarding-title">نظّم موادك ومهامك</h2>
-          <p class="onboarding-text">أضف موادك الدراسية، تابع محاضراتك ومهامك، وسجّل ملاحظاتك بسهولة</p>
-        </div>
-        <!-- Slide 3: Offline -->
-        <div class="onboarding-slide" data-slide="2">
-          <div class="onboarding-icon">
-            <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#24A58A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
-              <path d="M2 17l10 5 10-5"></path>
-              <path d="M2 12l10 5 10-5"></path>
-            </svg>
-          </div>
-          <h2 class="onboarding-title">يعمل بدون إنترنت</h2>
-          <p class="onboarding-text">جميع بياناتك محفوظة على جهازك. لا حاجة لإنترنت بعد التثبيت</p>
-        </div>
-      </div>
-      <!-- Dots Indicator -->
-      <div class="onboarding-dots">
-        <span class="onboarding-dot active" data-dot="0"></span>
-        <span class="onboarding-dot" data-dot="1"></span>
-        <span class="onboarding-dot" data-dot="2"></span>
-      </div>
-      <!-- Actions -->
-      <div class="onboarding-actions">
-        <button id="onboarding-next" class="btn btn-primary onboarding-btn">التالي</button>
-        <button id="onboarding-skip" class="btn btn-text onboarding-skip">تخطي</button>
-      </div>
-    </div>
-  </div>
 
   <!-- App Entry Point -->
   <script type="module" src="js/app.js"></script>

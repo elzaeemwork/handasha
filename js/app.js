@@ -201,6 +201,7 @@ async function checkDueReminders() {
  * Initialize app.
  */
 async function init() {
+  console.log('[HANDASHA] 1. Starting init...');
   // 1. Apply theme early
   applyTheme();
 
@@ -208,10 +209,12 @@ async function init() {
   setupBottomNav();
   setupFAB();
 
+  console.log('[HANDASHA] 2. Connecting to DB...');
   // 3. Connect to IndexedDB
   try {
     await getDB();
     appState.dbReady = true;
+    console.log('[HANDASHA] 3. DB ready');
   } catch (err) {
     console.error('[HANDASHA] Database initialization error:', err);
     toast('تعذر تهيئة قاعدة البيانات المحلية.', 'error');
@@ -224,11 +227,13 @@ async function init() {
   checkDueReminders();
   appState.reminderInterval = setInterval(checkDueReminders, 60000);
 
+  console.log('[HANDASHA] 4. Initializing router...');
   // 6. Initialize SPA Router
   initRouter();
   syncBottomNav(getCurrentRoute());
 
   appState.initialized = true;
+  console.log('[HANDASHA] 5. Init complete!');
 }
 
 // Start app once DOM is loaded
